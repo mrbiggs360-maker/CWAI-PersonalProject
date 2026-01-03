@@ -8,15 +8,15 @@
   "description": "Offline Local AI Chat Interface",
   "icons": [
     {
-      "src": "https://cdn.jsdelivr.net/npm/remixicon@3.5.0/icons/System/openai-fill.svg",
+      "src": "https://dummyimage.com/192x192/2563eb/ffffff.png&text=CWAI",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://cdn.jsdelivr.net/npm/remixicon@3.5.0/icons/System/openai-fill.svg",
+      "src": "https://dummyimage.com/512x512/2563eb/ffffff.png&text=CWAI",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
