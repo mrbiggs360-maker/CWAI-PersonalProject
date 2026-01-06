@@ -1,51 +1,50 @@
-// sw.js - Service Worker for CWAI
-const CACHE_NAME = 'cwai-v1-cache';
+// sw.js - Optimized for CWAI 0.9.9 RC
+const CACHE_NAME = 'cwai-v0.9.9-rc1';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  // External libraries (CDNs) used in your app
+  // UI Assets
   'https://cdn.tailwindcss.com',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap',
   'https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css',
   'https://cdn.jsdelivr.net/npm/marked/marked.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'
-  // Note: We don't cache WebLLM here because it handles its own massive model caching
+  'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js',
+  // Optimization: Cache the AI Engine library itself
+  'https://esm.run/@mlc-ai/web-llm',
+  'https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm'
 ];
 
-// 1. Install Event: Cache the App Shell
+// Install: Force the new worker to take over immediately
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('Opened cache');
-      return cache.addAll(ASSETS);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
 
-// 2. Fetch Event: Serve from Cache, then Network
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Return cache if found, otherwise go to network
-      return response || fetch(event.request);
-    })
-  );
-});
-
-// 3. Activate Event: Clean up old caches
+// Activate: Claim clients to start controlling the page without a reload
 self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.keys().then((keys) => Promise.all(
+      keys.map((key) => {
+        if (key !== CACHE_NAME) return caches.delete(key);
+      })
+    ))
+  );
+  self.clients.claim();
+});
+
+// Fetch: Network-First Strategy (Best for active development)
+self.addEventListener('fetch', (event) => {
+  // We only intercept GET requests
+  if (event.request.method !== 'GET') return;
+
+  event.respondWith(
+    fetch(event.request)
+      .catch(() => {
+        // If network fails (Offline), look in cache
+        return caches.match(event.request);
+      })
   );
 });
