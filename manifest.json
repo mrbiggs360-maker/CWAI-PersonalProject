@@ -1,10 +1,10 @@
 {
-  "name": "CWAI 0.9.9",
+  "name": "CWAI",
   "short_name": "CWAI",
   "start_url": "./",
   "id": "./index.html",
   "display": "standalone",
-  "background_color": "#000000",
+  "background_color": "#050505",
   "theme_color": "#2563eb",
   "description": "Offline Local AI Chat Interface",
   "orientation": "portrait-primary",
