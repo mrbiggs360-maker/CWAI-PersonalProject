@@ -2,1063 +2,798 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CWAI 0.9.9 - Final Streaming</title>
-    
-    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CWAI 1.2.5.1 | Neural Interface</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark-reasonable.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { gray: { 850: '#1f2937', 900: '#111827', 950: '#0b0f19' } },
+                    colors: { 
+                        gray: { 850: '#1f2937', 900: '#111827', 950: '#0b0f19' },
+                    },
                     fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
-                    animation: { 'slide-up': 'slideUp 0.3s ease-out forwards', 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                    animation: {
+                        'enter-message': 'slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'slide-in': 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pop-in': 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                    },
+                    keyframes: {
+                        slideUpFade: {
+                            '0%': { opacity: 0, transform: 'translateY(10px) scale(0.98)' },
+                            '100%': { opacity: 1, transform: 'translateY(0) scale(1)' },
+                        },
+                        slideInRight: {
+                            '0%': { opacity: 0, transform: 'translateX(10px)' },
+                            '100%': { opacity: 1, transform: 'translateX(0)' },
+                        },
+                        popIn: {
+                            '0%': { opacity: 0, transform: 'scale(0.9)' },
+                            '100%': { opacity: 1, transform: 'scale(1)' },
+                        }
+                    }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #000000; color: #e5e7eb; font-family: 'Inter', sans-serif; overflow: hidden; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
-        ::-webkit-scrollbar-track { background: transparent; }
+        :root { --app-bg: #050505; }
+        body { background-color: var(--app-bg); color: #e5e7eb; font-family: 'Inter', sans-serif; overflow: hidden; -webkit-tap-highlight-color: transparent; }
         
-        /* Markdown Styles */
-        .prose { font-size: 0.95rem; line-height: 1.6; max-width: none; }
-        .prose pre { background: #111827 !important; border-radius: 0.5rem; padding: 1rem; margin: 0.5rem 0; border: 1px solid #374151; overflow-x: auto; }
-        .prose code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: rgba(255,255,255,0.1); padding: 0.1rem 0.3rem; rounded: 0.2rem; }
-        .prose pre code { background: transparent; padding: 0; color: inherit; }
-        .prose p { margin-bottom: 0.75rem; }
-        .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .prose ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .prose strong { color: #fff; font-weight: 600; }
-        .prose a { color: #60a5fa; text-decoration: underline; }
-        .prose table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
-        .prose th, .prose td { border: 1px solid #374151; padding: 0.5rem; text-align: left; }
-        .prose th { background: #1f2937; color: #fff; }
+        .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        
+        .prose { font-size: 0.95rem; line-height: 1.6; max-width: none; color: #d1d5db; }
+        .prose pre { background: #161b22 !important; border-radius: 0.5rem; padding: 0.8rem; margin: 0.8rem 0; border: 1px solid #30363d; overflow-x: auto; position: relative; }
+        .prose code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: rgba(255,255,255,0.08); padding: 0.2rem 0.4rem; border-radius: 0.25rem; }
+        
+        .glass { background: rgba(10, 10, 10, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .glass-heavy { background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        
+        .msg-user { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; border-radius: 18px 18px 4px 18px; }
+        .msg-ai { background-color: transparent; color: #e5e7eb; border-radius: 18px 18px 18px 4px; }
+        
+        #control-panel { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; }
+        #control-panel.closed { transform: translateX(100%); opacity: 0; pointer-events: none; }
+        #control-panel.open { transform: translateX(0); opacity: 1; pointer-events: auto; }
+        
+        .copy-code-btn { position: absolute; top: 0.5rem; right: 0.5rem; font-size: 0.7rem; padding: 2px 6px; background: rgba(255,255,255,0.1); border-radius: 4px; color: #aaa; cursor: pointer; opacity: 0; transition: 0.2s; }
+        .prose pre:hover .copy-code-btn { opacity: 1; }
 
-        .fade-in { animation: fadeIn 0.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
-        
-        .typing-dot { width: 5px; height: 5px; background-color: #9ca3af; border-radius: 50%; display: inline-block; animation: typingBounce 1.4s infinite ease-in-out both; }
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; } .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes typingBounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-        
-        .modal-backdrop { background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(4px); }
-        .tab-btn.active { color: #60a5fa; border-bottom: 2px solid #60a5fa; }
-        .tab-btn { color: #9ca3af; border-bottom: 2px solid transparent; }
-        
-        .msg-user { background-color: #2563eb; color: white; border-radius: 18px 18px 0 18px; }
-        .msg-ai { background-color: transparent; color: #e5e7eb; padding-left: 0; }
-        
-        body.focus-active #main-header, body.focus-active #floating-menu { display: none !important; }
-        body.focus-active #focus-exit-btn { display: flex !important; }
-        body.focus-active #chat-container { padding-top: 20px; }
+        .loader-bar-bg { overflow: hidden; position: relative; }
+        .loader-bar-bg::after { content:''; position: absolute; top:0; left:0; bottom:0; right:0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transform: translateX(-100%); animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col relative bg-black">
+<body class="h-screen w-screen flex flex-col relative bg-black selection:bg-blue-500/30 selection:text-blue-200">
 
-    <div id="main-header" class="fixed top-0 left-0 right-0 h-14 bg-black/80 backdrop-blur-md z-10 flex items-center justify-between px-4 border-b border-gray-900 transition-all">
-        <div>
-            <h1 class="text-lg font-bold text-blue-500 tracking-tight flex items-center gap-2">
-                CWAI 0.9.9 
-                <span class="text-[10px] bg-blue-900/30 text-blue-400 px-1.5 py-0.5 rounded border border-blue-900/50">STREAM</span>
-            </h1>
-            <div id="header-model-status" class="text-[10px] text-gray-400 flex items-center gap-1 cursor-pointer hover:text-white transition">
-                <span class="w-2 h-2 rounded-full bg-red-500 shadow-lg shadow-red-500/50" id="status-dot"></span>
-                <span id="current-model-name">No Model</span>
-                <span id="token-display" class="ml-2 pl-2 border-l border-gray-700 font-mono text-[9px] text-gray-500">TOKENS: 0%</span>
+    <div id="main-header" class="fixed top-0 left-0 right-0 h-14 glass z-20 flex items-center justify-between px-4 border-b border-gray-800 transition-transform duration-300">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-2xl bg-gradient-to-b from-blue-600 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-900/40 cursor-pointer hover:scale-105 transition-transform duration-300" onclick="togglePanel(true)">
+                 <svg viewBox="0 0 100 100" class="w-6 h-6 text-white drop-shadow-md" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M50 85 C40 85 25 75 25 55 C25 35 35 25 45 25 C35 25 30 35 30 45" />
+                    <path d="M50 85 C60 85 75 75 75 55 C75 35 65 25 55 25 C65 25 70 35 70 45" />
+                    <path d="M45 25 C50 25 50 45 35 55" />
+                    <path d="M55 25 C50 25 50 45 65 55" />
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-sm font-bold text-gray-100 tracking-tight leading-none">CWAI 1.2.5.1</h1>
+                <div id="header-model-status" class="text-[10px] text-gray-400 flex items-center gap-1 cursor-pointer hover:text-blue-400 transition mt-0.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]" id="status-dot"></span>
+                    <span id="current-model-name">No Model Loaded</span>
+                </div>
             </div>
         </div>
         <div class="flex gap-1">
-            <button id="header-voice-toggle" class="text-gray-500 hover:text-white h-8 w-8 rounded hover:bg-gray-800 flex items-center justify-center transition" title="Text-to-Speech"><i class="ri-volume-mute-line text-lg" id="voice-icon"></i></button>
-            <button id="header-focus-btn" class="text-gray-400 hover:text-white h-8 w-8 rounded hover:bg-gray-800 flex items-center justify-center transition" title="Focus Mode"><i class="ri-fullscreen-line text-lg"></i></button>
-            <button id="header-menu-btn" class="text-gray-400 hover:text-white h-8 w-8 rounded hover:bg-gray-800 flex items-center justify-center transition" title="Menu"><i class="ri-menu-line text-lg"></i></button>
+            <button id="header-focus-btn" class="text-gray-400 hover:text-white h-9 w-9 rounded-full hover:bg-gray-800/50 flex items-center justify-center transition" title="Focus Mode"><i class="ri-fullscreen-line"></i></button>
+            <button id="header-menu-btn" class="text-gray-400 hover:text-white h-9 w-9 rounded-full hover:bg-gray-800/50 flex items-center justify-center transition" title="Settings"><i class="ri-settings-4-line text-lg"></i></button>
         </div>
     </div>
 
-    <button id="focus-exit-btn" class="hidden fixed top-4 right-4 z-50 bg-gray-800/50 hover:bg-red-900/80 text-gray-400 hover:text-white px-3 py-1 rounded-full text-xs items-center gap-2 backdrop-blur transition border border-gray-700 shadow-lg">
+    <button id="focus-exit-btn" class="hidden fixed top-4 right-4 z-50 bg-black/50 hover:bg-red-900/80 text-gray-300 hover:text-white px-4 py-1.5 rounded-full text-xs font-medium backdrop-blur-md transition border border-gray-700 shadow-xl flex items-center gap-2">
         <i class="ri-fullscreen-exit-line"></i> Exit Focus
     </button>
 
-    <div id="chat-container" class="flex-1 overflow-y-auto pt-16 pb-24 px-4 max-w-3xl mx-auto w-full space-y-6 scroll-smooth">
-        <div id="welcome-message" class="flex flex-col items-center justify-center h-full text-gray-600 mt-10 opacity-50">
-            <i class="ri-openai-fill text-6xl mb-4 text-gray-800"></i>
-            <p class="text-sm font-mono">Select a model to begin.</p>
-        </div>
-    </div>
-
-    <div class="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur border-t border-gray-900 p-3 pb-4 z-20">
-        <div class="max-w-3xl mx-auto flex items-end gap-2 relative">
-            <button id="mic-btn" class="h-10 w-10 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white flex items-center justify-center shrink-0 border border-gray-700 transition"><i class="ri-mic-line text-xl"></i></button>
-            <div class="flex-1 relative">
-                <textarea id="user-input" rows="1" class="w-full bg-gray-900 text-white rounded-2xl border border-gray-700 px-4 py-3 pr-10 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 resize-none overflow-hidden max-h-48 text-sm transition-colors shadow-inner" placeholder="Type a message..."></textarea>
-                <div id="typing-indicator" class="hidden absolute right-3 bottom-3 text-xs text-gray-500 animate-pulse">Saving...</div>
+    <div id="chat-container" class="flex-1 overflow-y-auto pt-20 pb-36 px-4 md:px-0 max-w-3xl mx-auto w-full space-y-6 custom-scroll scroll-smooth">
+        <div id="welcome-message" class="flex flex-col items-center justify-center h-[60vh] text-gray-600 fade-in">
+            <div class="w-20 h-20 rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center mb-6 shadow-2xl rotate-3 hover:rotate-0 transition duration-500 group">
+                 <i class="ri-cpu-line text-5xl text-gray-700 group-hover:text-blue-500 transition-colors"></i>
             </div>
-            <button id="send-btn" class="h-10 w-10 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-900/20 transition transform hover:scale-105 active:scale-90"><i class="ri-arrow-up-line text-xl"></i></button>
+            <h2 class="text-xl font-bold text-gray-300 mb-2">Neural Interface Ready</h2>
+            <p class="text-sm font-mono text-gray-500 text-center max-w-xs" id="ram-welcome-msg">Detecting Hardware...</p>
         </div>
     </div>
 
-    <div id="floating-menu" class="fixed bottom-24 right-6 z-30 flex flex-col items-end gap-3 pointer-events-none">
-        <div id="floating-items" class="hidden flex-col gap-2 items-end mb-1 pointer-events-auto">
-            <button id="float-new-btn" class="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-full shadow-lg border border-gray-700 w-10 h-10 flex items-center justify-center" title="New Chat"><i class="ri-chat-new-line"></i></button>
-            <button id="float-copy-btn" class="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-full shadow-lg border border-gray-700 w-10 h-10 flex items-center justify-center" title="Copy Chat"><i class="ri-file-copy-line"></i></button>
+    <div class="fixed bottom-0 left-0 right-0 glass-heavy border-t border-gray-800 p-3 pb-5 z-20">
+        <div class="max-w-3xl mx-auto flex flex-col gap-3">
+            <div class="flex justify-center gap-6 pb-1 opacity-60 hover:opacity-100 transition duration-300">
+                <button onclick="quickAction('Suggest a creative idea')" class="text-[10px] text-gray-400 hover:text-purple-400 uppercase font-bold tracking-widest flex items-center gap-1.5"><i class="ri-lightbulb-flash-line"></i> Idea</button>
+                <button onclick="quickAction('Improve the text above')" class="text-[10px] text-gray-400 hover:text-blue-400 uppercase font-bold tracking-widest flex items-center gap-1.5"><i class="ri-edit-circle-line"></i> Refine</button>
+                <button onclick="quickAction('Continue the story')" class="text-[10px] text-gray-400 hover:text-green-400 uppercase font-bold tracking-widest flex items-center gap-1.5"><i class="ri-arrow-right-circle-line"></i> Next</button>
+            </div>
+
+            <div class="flex items-end gap-2 relative bg-gray-900/80 p-1.5 rounded-[24px] border border-gray-800 shadow-xl ring-1 ring-white/5 focus-within:ring-blue-500/50 focus-within:border-blue-500/50 transition-all duration-300">
+                <button id="mic-btn" class="h-10 w-10 rounded-full text-gray-400 hover:text-white hover:bg-gray-800 flex items-center justify-center shrink-0 transition"><i class="ri-mic-line text-lg"></i></button>
+                <textarea id="user-input" rows="1" class="w-full bg-transparent text-gray-100 px-2 py-2.5 focus:outline-none resize-none overflow-hidden max-h-48 text-sm placeholder-gray-600 font-medium" placeholder="Message System..."></textarea>
+                <button id="send-btn" class="h-10 w-10 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-900/20 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50">
+                    <i class="ri-arrow-up-line text-xl"></i>
+                </button>
+            </div>
         </div>
-        <button id="float-toggle-btn" class="bg-gray-800 hover:bg-blue-600 text-blue-500 hover:text-white border border-gray-700 w-12 h-12 rounded-full shadow-xl flex items-center justify-center transition hover:scale-110 active:scale-95 pointer-events-auto group">
-            <i class="ri-add-line text-2xl transition-transform group-hover:rotate-90"></i>
+    </div>
+
+    <div id="floating-menu" class="fixed bottom-36 right-6 z-30 flex flex-col items-end gap-3 pointer-events-none">
+        <div id="floating-items" class="flex flex-col gap-3 items-end mb-2 transition-all duration-300 opacity-0 translate-y-4 pointer-events-none scale-95 origin-bottom-right">
+            <button id="float-new-btn" class="bg-gray-800 hover:bg-gray-700 text-gray-200 p-2 rounded-full shadow-lg border border-gray-700 w-11 h-11 flex items-center justify-center pointer-events-auto transition hover:scale-110" title="New Chat"><i class="ri-chat-new-line text-lg"></i></button>
+            <button id="float-voice-btn" class="bg-gray-800 hover:bg-gray-700 text-gray-200 p-2 rounded-full shadow-lg border border-gray-700 w-11 h-11 flex items-center justify-center pointer-events-auto transition hover:scale-110" title="Toggle Voice"><i class="ri-volume-mute-line text-lg" id="float-voice-icon"></i></button>
+        </div>
+        <button id="float-toggle-btn" class="bg-blue-600 hover:bg-blue-500 text-white w-14 h-14 rounded-full shadow-2xl shadow-blue-900/50 flex items-center justify-center transition-all hover:scale-110 active:scale-95 pointer-events-auto group border border-blue-400/30">
+            <i class="ri-add-line text-3xl transition-transform duration-300 group-hover:rotate-90"></i>
         </button>
     </div>
 
-    <div id="control-panel" class="fixed inset-0 z-40 hidden modal-backdrop flex items-center justify-center p-4">
-        <div class="bg-gray-950 w-full max-w-md h-[700px] max-h-[90vh] rounded-2xl shadow-2xl border border-gray-800 flex flex-col overflow-hidden fade-in relative">
+    <div id="panel-backdrop" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm hidden transition-opacity duration-300" onclick="togglePanel(false)"></div>
+    <div id="control-panel" class="fixed top-0 right-0 bottom-0 w-full max-w-[400px] z-50 bg-gray-950 border-l border-gray-800 shadow-2xl flex flex-col closed">
+        
+        <div class="flex items-center justify-between px-6 py-5 shrink-0 border-b border-gray-900 bg-gray-950">
+            <h2 class="text-lg font-bold text-gray-100 flex items-center gap-2">Control Center</h2>
+            <button onclick="togglePanel(false)" class="text-gray-500 hover:text-white bg-gray-900 hover:bg-gray-800 rounded-full w-8 h-8 flex items-center justify-center transition"><i class="ri-close-line text-xl"></i></button>
+        </div>
+
+        <div class="flex items-center px-4 border-b border-gray-900 gap-1 text-xs font-medium mt-2 shrink-0 overflow-x-auto no-scrollbar">
+            <button class="tab-btn flex-1 py-3 text-center rounded-t-lg transition relative text-blue-400 active-tab" data-tab="models">Models</button>
+            <button class="tab-btn flex-1 py-3 text-center rounded-t-lg transition relative text-gray-500 hover:text-gray-300" data-tab="lore">Lore</button>
+            <button class="tab-btn flex-1 py-3 text-center rounded-t-lg transition relative text-gray-500 hover:text-gray-300" data-tab="data">Sessions</button>
+            <button class="tab-btn flex-1 py-3 text-center rounded-t-lg transition relative text-gray-500 hover:text-gray-300" data-tab="system">System</button>
+        </div>
+
+        <div id="panel-content" class="flex-1 overflow-y-auto p-5 custom-scroll relative">
             
-            <div class="flex items-center justify-between px-6 pt-5 pb-2 shrink-0 bg-gray-950 z-10">
-                <h2 class="text-xl font-bold text-gray-100">Control Center</h2>
-                <button id="close-panel-btn" class="text-gray-400 hover:text-white bg-gray-900 rounded-full w-8 h-8 flex items-center justify-center transition hover:bg-red-900/50"><i class="ri-close-line text-lg"></i></button>
-            </div>
-
-            <div class="flex items-center px-6 border-b border-gray-800 gap-6 text-sm font-medium mt-2 shrink-0 bg-gray-950">
-                <button class="tab-btn active pb-3" data-tab="models">Models</button>
-                <button class="tab-btn pb-3" data-tab="data">Sessions</button>
-                <button class="tab-btn pb-3" data-tab="system">System</button>
-            </div>
-
-            <div id="panel-content" class="flex-1 overflow-y-auto p-6 scrollbar-thin">
-                
-                <div id="tab-models" class="space-y-6">
-                    <div class="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
-                        <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-3 flex items-center gap-2"><i class="ri-cloud-line"></i> Cloud Models</h3>
-                        <div id="cloud-list" class="space-y-2"></div>
-                        <button id="add-cloud-model-btn" class="w-full mt-3 py-2 border border-dashed border-gray-700 text-gray-500 rounded-lg hover:bg-gray-900 hover:text-blue-400 text-xs transition font-mono">+ Add Custom Endpoint</button>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between items-end mb-3">
-                            <h3 class="text-xs font-bold text-green-500 uppercase tracking-wider flex items-center gap-2"><i class="ri-hard-drive-2-line"></i> Offline Models (WebLLM)</h3>
-                            <span id="ram-badge" class="text-[10px] bg-gray-800 text-gray-400 px-2 py-1 rounded border border-gray-700">Detecting RAM...</span>
+            <div id="tab-models" class="space-y-6 animate-slide-in">
+                <div class="bg-gray-900/40 rounded-xl p-4 border border-gray-800 hover:border-gray-700 transition">
+                    <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-4 flex items-center gap-2"><i class="ri-cloud-line"></i> Cloud API</h3>
+                    <div class="space-y-3 relative">
+                        <input type="password" id="cloud-key-primary" oninput="detectAndFill(this.value)" class="w-full bg-black/50 border border-gray-800 rounded-lg p-2.5 text-xs text-white font-mono focus:border-blue-500 outline-none transition" placeholder="Primary API Key (Paste here to auto-detect)">
+                        <input type="password" id="cloud-key-backup" class="w-full bg-black/50 border border-gray-800 rounded-lg p-2.5 text-xs text-white font-mono focus:border-blue-500 outline-none transition" placeholder="Backup API Key (Fallback)">
+                        
+                        <div class="relative group">
+                             <input type="text" id="cloud-endpoint" class="w-full bg-black/50 border border-gray-800 rounded-lg p-2.5 text-xs text-blue-200 font-mono focus:border-blue-500 outline-none transition" placeholder="API Endpoint URL (Auto-filled)">
+                             <div class="absolute right-3 top-2.5 text-gray-600 text-[10px] pointer-events-none group-focus-within:text-blue-500">URL</div>
                         </div>
-                        <div id="offline-list" class="space-y-3"></div>
+
+                        <div class="relative">
+                            <input type="text" id="cloud-model-id" onfocus="showModelSuggestions(true)" onblur="setTimeout(()=>showModelSuggestions(false), 200)" class="w-full bg-black/50 border border-gray-800 rounded-lg p-2.5 text-xs text-white font-mono focus:border-blue-500 outline-none transition" placeholder="Model ID (e.g. google/gemini-2.0-flash)">
+                            <div id="model-suggestions" class="hidden absolute top-full left-0 right-0 mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-xl z-20 max-h-40 overflow-y-auto custom-scroll">
+                                </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between pt-2">
+                            <span class="text-xs text-gray-400">Auto-Detect Provider</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="auto-detect-toggle" class="sr-only peer" checked>
+                                <div class="w-10 h-5 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                            </label>
+                        </div>
+                        <button id="activate-cloud-btn" class="w-full py-2.5 bg-blue-600/10 border border-blue-600/30 text-blue-400 text-xs font-bold rounded-lg hover:bg-blue-600 hover:text-white transition">Use Cloud Model</button>
                     </div>
                 </div>
 
-                <div id="tab-data" class="hidden space-y-4">
-                    <div class="relative">
-                        <i class="ri-search-line absolute left-3 top-2.5 text-gray-500 text-sm"></i>
-                        <input type="text" id="session-search" placeholder="Search chats..." class="w-full bg-gray-900 border border-gray-800 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
+                <div>
+                    <div class="flex justify-between items-end mb-3 px-1">
+                        <h3 class="text-xs font-bold text-green-500 uppercase tracking-wider flex items-center gap-2"><i class="ri-hard-drive-2-line"></i> Local (WebLLM)</h3>
+                        <span id="ram-badge" class="text-[9px] bg-gray-900 text-gray-500 px-2 py-1 rounded border border-gray-800 font-mono">Checking RAM...</span>
                     </div>
-                    
-                    <div class="bg-gray-900 rounded-xl p-1 border border-gray-800 min-h-[200px]">
-                        <div id="session-list" class="max-h-[300px] overflow-y-auto space-y-1 p-1 custom-scrollbar"></div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3 pt-2">
-                        <button id="export-btn" class="bg-gray-800 hover:bg-gray-700 text-white py-3 rounded-xl text-xs font-medium border border-gray-700 flex flex-col items-center gap-1"><i class="ri-upload-2-line text-lg"></i> Backup JSON</button>
-                        <button id="import-btn" class="bg-gray-800 hover:bg-gray-700 text-white py-3 rounded-xl text-xs font-medium border border-gray-700 flex flex-col items-center gap-1"><i class="ri-download-2-line text-lg"></i> Restore JSON</button>
-                    </div>
-                </div>
-
-                <div id="tab-system" class="hidden space-y-5">
-                    
-                    <div class="space-y-2 bg-gray-900/50 p-4 rounded-xl border border-gray-800">
-                        <div class="flex justify-between text-xs mb-1">
-                            <span class="text-gray-400 font-semibold">Context Limit Strategy</span>
-                            <span id="ctx-label" class="text-blue-400 font-mono font-bold">Safe</span>
-                        </div>
-                        <input type="range" id="ctx-slider" min="0" max="2" step="1" value="1" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
-                        <div class="flex justify-between text-[10px] text-gray-600 font-mono mt-1">
-                            <span>MINIMAL</span>
-                            <span>SAFE</span>
-                            <span>ULTIMATE</span>
-                        </div>
-                        <p id="ctx-desc" class="text-[10px] text-gray-500 mt-2 italic leading-tight">Balanced defaults. 2k-4k tokens depending on model.</p>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="text-xs font-semibold text-gray-400 uppercase">System Persona</label>
-                        <textarea id="system-prompt-input" class="w-full h-32 bg-gray-900 border border-gray-800 rounded-xl p-3 text-sm text-gray-200 focus:border-blue-500 outline-none resize-none font-mono leading-relaxed" placeholder="You are a helpful AI assistant..."></textarea>
-                    </div>
-
-                    <div class="space-y-2 bg-gray-900/50 p-4 rounded-xl border border-gray-800">
-                        <div class="flex justify-between text-xs mb-1">
-                            <span class="text-gray-400">Creativity (Temperature)</span>
-                            <span id="temp-val" class="text-blue-400 font-mono">0.7</span>
-                        </div>
-                        <input type="range" id="temp-slider" min="0" max="1" step="0.1" value="0.7" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
-                        <div class="flex justify-between text-[10px] text-gray-600">
-                            <span>Precise</span>
-                            <span>Creative</span>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between bg-gray-900/50 p-4 rounded-xl border border-gray-800">
-                        <div class="flex flex-col">
-                            <span class="text-sm font-semibold text-gray-200">Cloud Fallback</span>
-                            <span class="text-[10px] text-gray-500">If Cloud fails, use Local Model</span>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="fallback-toggle" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                    </div>
-                    
-                    <button id="wipe-data-btn" class="w-full py-3 text-xs text-red-500 border border-red-900/30 bg-red-900/10 rounded-xl hover:bg-red-900/20 transition">Factory Reset</button>
+                    <div id="offline-list" class="space-y-3"></div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div id="loading-overlay" class="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-8 hidden text-center backdrop-blur-xl">
-        <div class="w-16 h-16 border-4 border-gray-800 border-t-blue-500 rounded-full animate-spin mb-6"></div>
-        <h2 class="text-2xl font-bold text-white mb-2" id="loader-title">Initializing Engine</h2>
-        <p class="text-gray-400 text-sm max-w-xs" id="loader-text">Loading model weights into memory...</p>
-        <div class="w-64 bg-gray-800 rounded-full h-1 mt-6 overflow-hidden">
-            <div id="loader-bar" class="bg-blue-600 h-full transition-all duration-300 w-0"></div>
-        </div>
-        <button id="cancel-load-btn" class="mt-8 text-gray-500 hover:text-white text-xs underline">Cancel Loading</button>
-    </div>
-
-    <div id="download-modal" class="fixed inset-0 z-[80] bg-black/90 hidden flex items-center justify-center p-6 backdrop-blur">
-        <div class="bg-gray-900 p-8 rounded-2xl max-w-sm w-full border border-gray-800 text-center shadow-2xl">
-            <h3 class="text-lg font-bold text-white mb-2">Downloading Model</h3>
-            <p id="dl-status" class="text-xs text-blue-400 mb-6 font-mono">Starting...</p>
-            <div class="w-full bg-gray-800 rounded-full h-3 mb-6 overflow-hidden border border-gray-700">
-                <div id="dl-bar" class="bg-blue-600 h-full rounded-full transition-all duration-200" style="width: 0%"></div>
+            <div id="tab-lore" class="hidden space-y-4">
+                 <div class="bg-gray-900/40 rounded-xl p-4 border border-gray-800">
+                    <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-3" id="lore-header-text">Create Persona Card</h3>
+                    <input id="lore-name-input" type="text" placeholder="Character Name" class="w-full bg-black/50 border border-gray-800 rounded-lg p-2.5 text-xs text-white mb-2 focus:border-purple-500 outline-none">
+                    <textarea id="lore-desc-input" placeholder="Details (Personality, Appearance, Secret)" class="w-full bg-black/50 border border-gray-800 rounded-lg p-2.5 text-xs text-white h-24 resize-none focus:border-purple-500 outline-none mb-3"></textarea>
+                    <div class="flex gap-2">
+                        <button id="cancel-lore-btn" class="hidden w-1/3 py-2 bg-gray-800 border border-gray-700 text-gray-400 text-xs font-bold rounded-lg hover:bg-gray-700 transition">Cancel</button>
+                        <button id="add-lore-btn" class="flex-1 py-2 bg-purple-600/10 border border-purple-600/30 text-purple-400 text-xs font-bold rounded-lg hover:bg-purple-600 hover:text-white transition">Add to Context</button>
+                    </div>
+                </div>
+                <div id="lore-list" class="space-y-2 pb-4"></div>
             </div>
-            <button id="cancel-dl-btn" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-xs rounded-lg border border-gray-700">Cancel Download</button>
-        </div>
-    </div>
 
-    <div id="key-modal" class="hidden fixed inset-0 z-[90] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-gray-950 p-6 rounded-2xl border border-gray-800 w-full max-w-sm shadow-2xl">
-            <h3 class="text-white font-bold mb-4 text-lg">Configure API</h3>
-            <input type="text" id="api-name" class="w-full bg-gray-900 border border-gray-800 rounded-lg p-3 text-white mb-3 text-sm focus:border-blue-500 outline-none" placeholder="Model Name">
-            <input type="text" id="api-url" class="w-full bg-gray-900 border border-gray-800 rounded-lg p-3 text-white mb-3 text-xs font-mono focus:border-blue-500 outline-none" placeholder="Endpoint URL">
-            <input type="password" id="api-key" class="w-full bg-gray-900 border border-gray-800 rounded-lg p-3 text-white mb-6 text-sm focus:border-blue-500 outline-none" placeholder="API Key (stored locally)">
-            <input type="hidden" id="api-id-hidden">
-            <div class="flex justify-end gap-3">
-                <button id="cancel-key-btn" class="px-4 py-2 text-gray-400 text-xs rounded hover:text-white">Cancel</button>
-                <button id="save-key-btn" class="px-6 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-500 shadow-lg shadow-blue-900/20">Save</button>
+            <div id="tab-data" class="hidden space-y-4">
+                <div class="relative">
+                    <i class="ri-search-line absolute left-3 top-2.5 text-gray-500 text-sm"></i>
+                    <input type="text" id="session-search" placeholder="Filter chats..." class="w-full bg-gray-900 border border-gray-800 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-300 focus:border-blue-500 outline-none transition">
+                </div>
+                <div class="bg-gray-900/30 rounded-xl p-2 border border-gray-800 min-h-[250px]">
+                    <div id="session-list" class="max-h-[350px] overflow-y-auto space-y-1 p-1 custom-scroll"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <button id="load-presets-btn" class="bg-indigo-900/20 hover:bg-indigo-900/40 text-indigo-300 py-3 rounded-xl text-xs font-medium border border-indigo-500/20 flex flex-col items-center gap-1 transition"><i class="ri-book-read-line text-lg"></i> Examples</button>
+                    <button id="export-btn" class="bg-gray-800 hover:bg-gray-700 text-white py-3 rounded-xl text-xs font-medium border border-gray-700 flex flex-col items-center gap-1 transition"><i class="ri-upload-2-line text-lg"></i> Backup</button>
+                </div>
+                <button id="import-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-white py-3 rounded-xl text-xs font-medium border border-gray-700 flex items-center justify-center gap-2 transition"><i class="ri-download-2-line text-lg"></i> Restore Backup</button>
+            </div>
+            
+            <div id="tab-system" class="hidden space-y-6">
+                <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Context Limit</span>
+                        <span id="ctx-label" class="text-blue-400 font-mono font-bold text-xs">SAFE</span>
+                    </div>
+                    <input type="range" id="ctx-slider" min="0" max="2" step="1" value="1" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-600 mb-2">
+                    <div class="flex justify-between text-[9px] text-gray-500 font-mono mb-3"><span>MINIMAL</span><span>SAFE</span><span>ULTIMATE</span></div>
+                    <p id="ctx-desc" class="text-[11px] text-gray-500 leading-relaxed border-t border-gray-800 pt-3">Safe 'Sweet Spot'. 4k tokens. Recommended.</p>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide">System Persona</label>
+                    <textarea id="system-prompt-input" class="w-full h-40 bg-gray-900 border border-gray-800 rounded-xl p-3 text-xs text-gray-300 focus:border-blue-500 outline-none resize-none font-mono leading-relaxed custom-scroll" placeholder="You are a helpful AI assistant..."></textarea>
+                </div>
+                <div class="space-y-3 bg-gray-900/40 p-4 rounded-xl border border-gray-800">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-400 uppercase font-semibold">Temperature</span>
+                        <span id="temp-val" class="text-blue-400 font-mono">0.7</span>
+                    </div>
+                    <input type="range" id="temp-slider" min="0" max="1" step="0.1" value="0.7" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                </div>
+                <button id="wipe-data-btn" class="w-full py-3 text-xs text-red-400 border border-red-900/30 bg-red-900/10 rounded-xl hover:bg-red-900/20 transition font-bold uppercase tracking-wider">Reset App Data</button>
             </div>
         </div>
     </div>
-    
-    <div id="import-modal" class="hidden fixed inset-0 z-[90] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
+
+    <div id="loading-overlay" class="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-8 hidden text-center backdrop-blur-xl transition-opacity duration-300">
+        <div class="w-16 h-16 border-2 border-gray-800 border-t-blue-500 rounded-full animate-spin mb-6"></div>
+        <h2 class="text-2xl font-bold text-white mb-2 tracking-tight" id="loader-title">Initializing</h2>
+        <p class="text-gray-400 text-sm max-w-xs mb-8" id="loader-text">Please wait...</p>
+        <div class="w-64 bg-gray-800 rounded-full h-1.5 overflow-hidden loader-bar-bg"><div id="loader-bar" class="bg-blue-500 h-full transition-all duration-300 w-0 shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div></div>
+        <button id="cancel-load-btn" class="mt-8 text-gray-500 hover:text-white text-xs uppercase tracking-widest font-bold">Cancel</button>
+    </div>
+
+    <div id="import-modal" class="hidden fixed inset-0 z-[90] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm animate-pop-in">
         <div class="bg-gray-950 p-6 rounded-2xl border border-gray-800 w-full max-w-lg shadow-2xl flex flex-col h-[500px]">
-            <h3 class="text-white font-bold mb-2">Import Data (JSON)</h3>
-            <textarea id="import-area" class="flex-1 w-full bg-gray-900 border border-gray-800 rounded-lg p-4 text-xs text-gray-300 font-mono resize-none focus:border-blue-500 mb-4 outline-none" placeholder="Paste JSON here..."></textarea>
+            <h3 class="text-white font-bold mb-4 text-lg">Import Data</h3>
+            <textarea id="import-area" class="flex-1 w-full bg-gray-900 border border-gray-800 rounded-xl p-4 text-xs text-gray-300 font-mono resize-none focus:border-blue-500 mb-4 outline-none" placeholder="Paste your backup JSON string here..."></textarea>
             <div class="flex justify-end gap-3">
-                <button onclick="document.getElementById('import-modal').classList.add('hidden')" class="px-4 py-2 text-gray-400 text-xs hover:text-white">Cancel</button>
-                <button id="confirm-import-btn" class="px-6 py-2 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-500 shadow-lg shadow-green-900/20">Load Data</button>
+                <button onclick="document.getElementById('import-modal').classList.add('hidden')" class="px-5 py-2.5 text-gray-400 text-xs font-bold rounded-lg hover:text-white transition">Cancel</button>
+                <button id="confirm-import-btn" class="px-6 py-2.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-500 shadow-lg shadow-blue-900/20 transition">Load Data</button>
             </div>
         </div>
     </div>
 
-    <div id="toast-container" class="fixed top-4 right-4 z-[110] flex flex-col gap-2 pointer-events-none"></div>
+    <div id="update-toast" class="fixed bottom-6 right-6 z-[120] translate-y-20 opacity-0 pointer-events-none transition-all duration-500 ease-out">
+        <div class="bg-gray-900/95 border border-blue-500/30 p-4 rounded-xl shadow-2xl backdrop-blur-xl flex items-center gap-4 max-w-sm">
+            <div class="bg-blue-600/20 p-2.5 rounded-full text-blue-400">
+                <i class="ri-refresh-line text-xl animate-spin"></i>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-white">Update Available</h4>
+                <p class="text-xs text-gray-400">New version ready to install.</p>
+            </div>
+            <button id="update-btn" class="ml-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg shadow-lg transition">
+                Update
+            </button>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed top-20 right-4 z-[110] flex flex-col gap-2 pointer-events-none"></div>
 
     <script type="module">
         import * as webllm from "https://esm.run/@mlc-ai/web-llm";
-        import { get, set, del, update } from 'https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm';
+        import { get, set, del } from 'https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm';
 
-        // --- Configuration & Constants ---
-        const DB_KEY = 'cwai_099_db';
+        // --- CONSTANTS ---
+        const DB_KEY = 'cwai_1_2_5_db';
         const OFFLINE_MODELS = [
-            { id: "TinyLlama-1.1B-Chat-v0.4-q4f32_1-MLC-1k", name: "TinyLlama 1.1B", ram: 2, tags: ["Fast", "Low RAM"], nativeLimit: 2048, safeLimit: 2048 },
-            { id: "gemma-2-2b-it-q4f32_1-MLC", name: "Gemma 2 2B", ram: 4, tags: ["Balanced", "Google"], nativeLimit: 8192, safeLimit: 4096 },
-            { id: "Llama-3.2-3B-Instruct-q4f16_1-MLC", name: "Llama 3.2 3B", ram: 6, tags: ["Smart", "Meta"], nativeLimit: 128000, safeLimit: 4096 },
-            { id: "Mistral-7B-Instruct-v0.3-q4f16_1-MLC", name: "Mistral 7B", ram: 8, tags: ["Creative", "Heavy"], nativeLimit: 32768, safeLimit: 2048 }
+            { id: "TinyLlama-1.1B-Chat-v0.4-q4f32_1-MLC-1k", name: "TinyLlama 1.1B", reqRam: 2, tags: ["Fast", "Light"], limits: [1024, 2048, 2048] },
+            { id: "gemma-2-2b-it-q4f32_1-MLC", name: "Gemma 2 2B", reqRam: 4, tags: ["Balanced", "Google"], limits: [2048, 4096, 8192] },
+            { id: "Llama-3.2-3B-Instruct-q4f16_1-MLC", name: "Llama 3.2 3B", reqRam: 6, tags: ["Smart", "Meta"], limits: [2048, 4096, 128000] },
+            { id: "Mistral-7B-Instruct-v0.3-q4f16_1-MLC", name: "Mistral 7B", reqRam: 8, tags: ["Creative", "Heavy"], limits: [2048, 4096, 32768] }
         ];
-        
-        // --- State Management ---
-        let state = {
-            sessions: {},
-            currentSessionId: null,
-            models: {
-                "gpt-4o": { id: "gpt-4o", name: "GPT-4o", provider: "openai", url: "https://api.openai.com/v1/chat/completions", key: "" },
-                "gemini-flash": { id: "gemini-flash", name: "Gemini Flash", provider: "google", url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent", key: "" }
+
+        // --- CLOUD PROVIDER DATA ---
+        const CLOUD_PROVIDERS = {
+            google: {
+                url: "https://generativelanguage.googleapis.com/v1beta/models",
+                models: [
+                    "gemini-3.0-pro-preview-01", "gemini-2.5-flash-latest", "gemini-2.0-flash-lite-preview-02-05", 
+                    "gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"
+                ]
             },
-            settings: { activeModelId: null, temperature: 0.7, fallback: true, tts: false, contextStrategy: 1 }, 
-            downloadedModels: [],
-            draft: "" 
+            openrouter: {
+                url: "https://openrouter.ai/api/v1/chat/completions",
+                models: [
+                    "google/gemini-2.0-flash-001", "anthropic/claude-3-opus", "meta-llama/llama-3-70b-instruct",
+                    "deepseek/deepseek-r1"
+                ]
+            },
+            deepseek: {
+                url: "https://api.deepseek.com/chat/completions",
+                models: ["deepseek-chat", "deepseek-coder"]
+            }
         };
 
-        let engine = null;
-        let isGenerating = false;
-        let isDownloading = false; 
-        let modelLoaded = false; // Track actual loaded status
-
-        // --- UI Helper ---
+        let state = {
+            sessions: {}, currentSessionId: null,
+            cloud: { primary: "", backup: "", targetModel: "", endpoint: "", autoDetect: true },
+            settings: { activeModelId: null, temperature: 0.7, tts: false, contextStrategy: 1 },
+            downloadedModels: []
+        };
+        // ADDED: loadedModelId to track what is currently in VRAM
+        let engine = null, isDownloading = false, modelLoaded = false, editingLoreIndex = -1, loadedModelId = null;
+        let deviceRam = navigator.deviceMemory || 4;
+        
         const $ = (id) => document.getElementById(id);
         const ui = {
             toast(msg, type='info') {
                 const el = document.createElement('div');
-                const colors = { error: 'bg-red-900/90 border-red-700', success: 'bg-green-900/90 border-green-700', warn: 'bg-yellow-900/90 border-yellow-700', info: 'bg-gray-800/90 border-gray-700' };
-                el.className = `p-3 rounded-xl border text-xs text-white shadow-xl backdrop-blur fade-in pointer-events-auto flex items-center gap-2 ${colors[type]||colors.info}`;
-                el.innerHTML = `<i class="ri-${type==='error'?'error-warning':(type==='success'?'checkbox-circle':'information')}-line"></i> ${msg}`;
+                const styles = { error: 'bg-red-500/10 border-red-500/50 text-red-200', success: 'bg-green-500/10 border-green-500/50 text-green-200', info: 'bg-gray-800/90 border-gray-700 text-gray-200' };
+                el.className = `p-3 rounded-lg border text-xs shadow-xl backdrop-blur fade-in pointer-events-auto flex items-center gap-2 transform transition-all duration-300 ${styles[type]||styles.info}`;
+                el.innerHTML = `<i class="ri-${type==='error'?'error-warning':(type==='success'?'checkbox-circle':'information')}-line text-base"></i> <span class="font-medium">${msg}</span>`;
                 $('toast-container').appendChild(el);
-                setTimeout(() => { el.style.opacity='0'; setTimeout(()=>el.remove(), 300); }, 3000);
+                setTimeout(() => { el.style.opacity='0'; el.style.transform='translateX(20px)'; setTimeout(()=>el.remove(), 300); }, 3000);
             },
             showLoader(show, title, text) {
                 const l = $('loading-overlay');
-                if(show) { l.classList.remove('hidden'); if(title)$('loader-title').textContent=title; if(text)$('loader-text').textContent=text; }
-                else { l.classList.add('hidden'); }
-            },
-            updateRamBadge() {
-                const ram = navigator.deviceMemory || 4;
-                const badge = $('ram-badge');
-                badge.textContent = `RAM: ~${ram}GB`;
-                badge.className = `text-[10px] px-2 py-1 rounded border ${ram < 4 ? 'bg-red-900/30 text-red-400 border-red-900' : 'bg-green-900/30 text-green-400 border-green-900'}`;
+                if(show) { l.classList.remove('hidden'); requestAnimationFrame(() => l.classList.remove('opacity-0')); if(title)$('loader-title').textContent=title; if(text)$('loader-text').textContent=text; } 
+                else { l.classList.add('opacity-0'); setTimeout(() => l.classList.add('hidden'), 300); }
             },
             toggleFocus(active) {
-                if(active) document.body.classList.add('focus-active');
-                else document.body.classList.remove('focus-active');
+                document.body.classList.toggle('focus-active', active);
+                if(active) { $('main-header').classList.add('-translate-y-full'); $('floating-menu').classList.add('translate-y-20', 'opacity-0'); $('focus-exit-btn').classList.remove('hidden'); }
+                else { $('main-header').classList.remove('-translate-y-full'); $('floating-menu').classList.remove('translate-y-20', 'opacity-0'); $('focus-exit-btn').classList.add('hidden'); }
             }
         };
 
-        // --- Persistence Layer ---
-        async function saveState() { 
-            await set(DB_KEY, JSON.parse(JSON.stringify(state))); 
-        }
+        window.togglePanel = (show) => {
+            const p = $('control-panel'), b = $('panel-backdrop');
+            if(show) { b.classList.remove('hidden'); setTimeout(()=>b.classList.remove('opacity-0'), 10); p.classList.remove('closed'); p.classList.add('open'); } 
+            else { b.classList.add('opacity-0'); p.classList.remove('open'); p.classList.add('closed'); setTimeout(()=>b.classList.add('hidden'), 300); }
+        };
 
         async function loadState() {
             try {
+                $('ram-badge').textContent = `RAM: ~${deviceRam}GB`;
+                $('ram-welcome-msg').textContent = `System: ${deviceRam}GB RAM detected.`;
                 const data = await get(DB_KEY);
-                if (data) {
-                    state = { ...state, ...data, sessions: data.sessions || {}, models: { ...state.models, ...data.models } };
-                    if(!state.settings) state.settings = { activeModelId: null, temperature: 0.7, fallback: true, contextStrategy: 1 };
-                    if(typeof state.settings.contextStrategy === 'undefined') state.settings.contextStrategy = 1;
-                }
-                
-                ui.updateRamBadge();
+                if (data) state = { ...state, ...data, sessions: data.sessions || {}, cloud: { ...state.cloud, ...data.cloud } };
+
+                $('cloud-key-primary').value = state.cloud.primary || "";
+                $('cloud-key-backup').value = state.cloud.backup || "";
+                $('cloud-model-id').value = state.cloud.targetModel || "";
+                $('cloud-endpoint').value = state.cloud.endpoint || ""; // LOAD ENDPOINT
+                $('auto-detect-toggle').checked = state.cloud.autoDetect;
                 $('ctx-slider').value = state.settings.contextStrategy;
-                updateContextUI(state.settings.contextStrategy);
-                
-                renderSessions();
-                
-                if(state.draft) $('user-input').value = state.draft;
-                
                 $('temp-slider').value = state.settings.temperature;
                 $('temp-val').textContent = state.settings.temperature;
-                $('fallback-toggle').checked = state.settings.fallback;
-                updateVoiceIcon();
+                
+                updateContextUI(state.settings.contextStrategy);
+                renderSessions();
 
-                if (!state.currentSessionId || !state.sessions[state.currentSessionId]) {
-                    createSession();
-                } else {
-                    renderChat();
-                }
+                if (!state.currentSessionId || !state.sessions[state.currentSessionId]) createSession();
+                else { renderChat(); renderLore(); }
                 
                 updateHeader();
-
+                
+                // AUTO LOAD LOGIC
                 const activeId = state.settings.activeModelId;
-                const isLocal = OFFLINE_MODELS.find(m => m.id === activeId);
-                if (activeId && isLocal && state.downloadedModels.includes(activeId)) {
+                if(activeId && activeId !== 'cloud' && state.downloadedModels.includes(activeId)) {
+                    ui.toast("Restoring active model...", "info");
                     await initEngine(activeId);
                 }
-
-            } catch (e) {
-                console.error("Load Error", e);
-                ui.toast("Failed to load saved data.", "error");
-            }
+            } catch (e) { console.error(e); ui.toast("Load Error", "error"); }
         }
 
-        // --- Core Logic ---
-
-        function createSession() {
-            const id = Date.now().toString();
-            state.sessions[id] = { id, name: "New Chat", history: [], created: Date.now(), system: "" };
-            state.currentSessionId = id;
-            saveState();
-            renderSessions();
-            renderChat();
-            return id;
-        }
-        
-        function getEffectiveContextLimit(model) {
-            const s = parseInt(state.settings.contextStrategy);
-            if(s === 0) return 2048; // Minimal
-            if(s === 1) return model.safeLimit; // Safe
-            if(s === 2) return model.nativeLimit; // Ultimate
-            return 2048;
-        }
-
-        async function initEngine(modelId) {
-            const m = OFFLINE_MODELS.find(x => x.id === modelId);
-            if (!m) return;
+        // --- CLOUD AUTO DETECT LOGIC ---
+        window.detectAndFill = (key) => {
+            if(!key || !$('auto-detect-toggle').checked) return;
             
-            const ctxLimit = getEffectiveContextLimit(m);
-            modelLoaded = false; 
+            let provider = 'openrouter'; 
+            let keyType = "Unknown";
+
+            if(key.startsWith('AIza')) { provider = 'google'; keyType = "Google Gemini"; }
+            else if(key.startsWith('sk-or-')) { provider = 'openrouter'; keyType = "OpenRouter"; }
+            else if(key.startsWith('sk-')) { provider = 'deepseek'; keyType = "DeepSeek/Generic"; }
+
+            // Auto-fill URL
+            const endpoint = CLOUD_PROVIDERS[provider].url;
+            $('cloud-endpoint').value = endpoint;
             
-            ui.showLoader(true, `Loading ${m.name}`, `Context: ${ctxLimit} tokens...`);
-            try {
-                if (!engine) engine = new webllm.MLCEngine();
-                engine.setInitProgressCallback((report) => {
-                    $('loader-bar').style.width = (report.progress * 100) + '%';
-                    $('loader-text').textContent = report.text;
-                });
-                
-                // FINAL CONFIG: context_window -1 (sliding), attention_sink 0
-                await engine.reload(modelId, { 
-                    context_window_size: -1, 
-                    sliding_window_size: ctxLimit,
-                    attention_sink_size: 0,
-                    temperature: parseFloat(state.settings.temperature) 
-                });
-                
-                modelLoaded = true;
-                ui.toast(`Engine Ready (${ctxLimit} ctx)`, "success");
-            } catch (e) {
-                ui.toast("Engine Init Failed: " + e.message, "error");
-            } finally {
-                ui.showLoader(false);
-            }
+            // Populate Suggestions
+            const models = CLOUD_PROVIDERS[provider].models;
+            renderModelSuggestions(models);
+            
+            // Show toast
+            ui.toast(`Detected: ${keyType}`, "success");
+            
+            // Open suggestions automatically
+            showModelSuggestions(true);
+        };
+
+        function renderModelSuggestions(models) {
+            const list = $('model-suggestions');
+            list.innerHTML = models.map(m => 
+                `<div onclick="selectCloudModel('${m}')" class="px-3 py-2 text-xs text-gray-300 hover:bg-blue-600/20 hover:text-blue-300 cursor-pointer transition border-b border-gray-800 last:border-0">
+                    ${m}
+                 </div>`
+            ).join('');
         }
 
-        async function downloadModel(id) {
-            $('download-modal').classList.remove('hidden');
-            isDownloading = true;
-            try {
-                if (!engine) engine = new webllm.MLCEngine();
-                engine.setInitProgressCallback((report) => {
-                    if(!isDownloading) return; 
-                    $('dl-bar').style.width = (report.progress * 100) + '%';
-                    $('dl-status').textContent = report.text;
-                });
-                await engine.reload(id); 
-                if(isDownloading) {
-                    if (!state.downloadedModels.includes(id)) state.downloadedModels.push(id);
-                    await saveState();
-                    renderModels();
-                    ui.toast("Download Complete", "success");
-                }
-            } catch (e) {
-                if(isDownloading) ui.toast("Download Error: " + e.message, "error");
-            } finally {
-                $('download-modal').classList.add('hidden');
-                isDownloading = false;
-            }
-        }
+        window.selectCloudModel = (m) => {
+            $('cloud-model-id').value = m;
+            showModelSuggestions(false);
+        };
 
-        async function generateResponse() {
-            const txt = $('user-input').value.trim();
-            if (!txt) return;
-            
-            const session = state.sessions[state.currentSessionId];
-            const isLocal = OFFLINE_MODELS.find(m => m.id === state.settings.activeModelId);
+        window.showModelSuggestions = (show) => {
+            const el = $('model-suggestions');
+            if(show && el.children.length > 0) el.classList.remove('hidden');
+            else el.classList.add('hidden');
+        };
 
-            if (isLocal && (!engine || !modelLoaded)) {
-                ui.toast("Model not loaded. Please wait or reload.", "warn");
-                return;
-            }
-
-            $('user-input').value = '';
-            state.draft = '';
-            $('typing-indicator').classList.add('hidden');
-            
-            session.history.push({ role: 'user', content: txt });
-            // Add placeholder for streaming
-            session.history.push({ role: 'assistant', content: '<span class="typing-dot"></span><span class="typing-dot"></span>' });
-            
-            renderChat();
-            const container = $('chat-container');
-            container.scrollTop = container.scrollHeight;
-
-            try {
-                if (!state.settings.activeModelId) throw new Error("No model selected.");
-                
-                let sysPrompt = session.system || $('system-prompt-input').value || "You are a helpful AI assistant.";
-                let fullResponse = "";
-
-                async function getGeneration(msgs) {
-                    if (isLocal) {
-                        return await engine.chat.completions.create({
-                            messages: msgs,
-                            temperature: parseFloat(state.settings.temperature),
-                            stream: true // Enable Streaming
-                        });
-                    } else {
-                        return { cloudResult: await callCloud(state.settings.activeModelId, msgs) };
-                    }
-                }
-
-                let messages = [];
-                messages.push({ role: "system", content: sysPrompt });
-                messages.push(...session.history.slice(0, -1)); // Exclude placeholder
-
-                let responseStream;
-                
-                try {
-                    responseStream = await getGeneration(messages);
-                } catch (e) {
-                    console.warn("Standard generation failed. Retrying with injection...", e);
-                    const retryHistory = JSON.parse(JSON.stringify(session.history.slice(0, -1)));
-                    if (retryHistory.length > 0) {
-                        retryHistory[0].content = `[System Instruction: ${sysPrompt}]\n\n${retryHistory[0].content}`;
-                    }
-                    messages = retryHistory;
-                    responseStream = await getGeneration(messages);
-                }
-
-                if (isLocal) {
-                    const bubbles = container.querySelectorAll('.msg-ai');
-                    const lastBubble = bubbles[bubbles.length - 1];
-                    lastBubble.innerHTML = ""; 
-
-                    for await (const chunk of responseStream) {
-                        const content = chunk.choices[0]?.delta?.content || "";
-                        fullResponse += content;
-                        lastBubble.innerHTML = marked.parse(fullResponse);
-                        container.scrollTop = container.scrollHeight;
-                    }
-                } else {
-                    fullResponse = responseStream.cloudResult;
-                }
-
-                session.history[session.history.length - 1].content = fullResponse;
-                
-                if (session.history.length === 2 && session.name === "New Chat") {
-                    session.name = txt.substring(0, 30) + "...";
-                    renderSessions();
-                }
-
-                await saveState();
-                renderChat();
-                
-                if (state.settings.tts) speak(fullResponse);
-
-            } catch (e) {
-                console.error(e);
-                session.history.pop();
-                ui.toast("Error: " + e.message, 'error');
-                renderChat();
-            }
-        }
-
-        async function callCloud(modelId, messages) {
-            const m = state.models[modelId];
-            if (!m.key) throw new Error("API Key missing");
-
-            if (m.provider === 'openai') {
-                const res = await fetch(m.url, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${m.key}` },
-                    body: JSON.stringify({ model: "gpt-4o", messages, temperature: parseFloat(state.settings.temperature) })
-                });
-                if (!res.ok) throw new Error("OpenAI Error: " + res.status);
-                const d = await res.json();
-                return d.choices[0].message.content;
-            } else if (m.provider === 'google') {
-                const contents = messages.filter(x => x.role !== 'system').map(x => ({
-                    role: x.role === 'assistant' ? 'model' : 'user',
-                    parts: [{ text: x.content }]
-                }));
-                const sys = messages.find(x=>x.role==='system')?.content;
-                if(sys) contents[0].parts[0].text = "System: " + sys + "\n\n" + contents[0].parts[0].text;
-
-                const res = await fetch(`${m.url}?key=${m.key}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ contents })
-                });
-                if (!res.ok) throw new Error("Google Error: " + res.status);
-                const d = await res.json();
-                return d.candidates[0].content.parts[0].text;
-            } else {
-                const res = await fetch(m.url, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${m.key}` },
-                    body: JSON.stringify({ model: m.id, messages })
-                });
-                if(!res.ok) throw new Error("API Error");
-                const d = await res.json();
-                return d.choices[0].message.content;
-            }
-        }
-
-        // --- Voice Logic ---
-        function speak(text) {
-            window.speechSynthesis.cancel();
-            const u = new SpeechSynthesisUtterance(text);
-            u.rate = 1.1;
-            window.speechSynthesis.speak(u);
-        }
-
-        function startListening() {
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                ui.toast("Voice not supported in this browser", "error");
-                return;
-            }
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const rec = new SpeechRecognition();
-            rec.continuous = false;
-            rec.interimResults = false;
-            
-            $('mic-btn').classList.add('text-red-500', 'animate-pulse');
-            
-            rec.onresult = (e) => {
-                const txt = e.results[0][0].transcript;
-                $('user-input').value += ( $('user-input').value ? " " : "" ) + txt;
-                state.draft = $('user-input').value; 
-                saveState(); 
-            };
-            
-            rec.onend = () => {
-                $('mic-btn').classList.remove('text-red-500', 'animate-pulse');
-            };
-            
-            rec.start();
-        }
-
-        // --- Rendering ---
-        
-        function renderModels() {
-            const ram = navigator.deviceMemory || 4;
-            const contextStrat = parseInt(state.settings.contextStrategy); 
-
-            // Cloud
-            const cList = $('cloud-list');
-            cList.innerHTML = '';
-            Object.values(state.models).forEach(m => {
-                const isActive = state.settings.activeModelId === m.id;
-                cList.innerHTML += `
-                    <div class="bg-gray-800 p-3 rounded-lg border ${isActive ? 'border-blue-500' : 'border-gray-700'} flex justify-between items-center group transition">
-                        <div>
-                            <div class="text-xs font-bold text-gray-200">${m.name}</div>
-                            <div class="text-[10px] text-gray-500 font-mono">${m.provider.toUpperCase()}</div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button class="p-2 text-gray-400 hover:text-white" onclick="editCloud('${m.id}')"><i class="ri-settings-3-line"></i></button>
-                            <button class="px-3 py-1 text-xs rounded-md ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}" onclick="setActive('${m.id}')">
-                                ${isActive ? 'Active' : 'Select'}
-                            </button>
-                        </div>
-                    </div>`;
+        // --- LORE LOGIC ---
+        function renderLore() {
+            const l = $('lore-list'); l.innerHTML = '';
+            (state.sessions[state.currentSessionId]?.lore || []).forEach((c,i) => {
+                const d = document.createElement('div');
+                d.className = "bg-gray-800/50 p-2.5 rounded-lg flex justify-between border border-gray-700 mb-2";
+                d.innerHTML = `
+                    <div class="overflow-hidden flex-1 cursor-pointer" onclick="editLore(${i})">
+                        <div class="text-xs font-bold text-purple-400 flex items-center gap-2">${c.name} <i class="ri-pencil-line text-gray-600 text-[10px]"></i></div>
+                        <div class="text-[10px] text-gray-400 line-clamp-2">${c.description}</div>
+                    </div>
+                    <button class="text-gray-500 hover:text-red-400 px-1 ml-2" onclick="delLore(${i})"><i class="ri-close-circle-line"></i></button>`;
+                l.appendChild(d);
             });
+            if(editingLoreIndex === -1) resetLoreForm();
+        }
 
-            // Local
-            const oList = $('offline-list');
-            oList.innerHTML = '';
-            OFFLINE_MODELS.forEach(m => {
-                const isDownloaded = state.downloadedModels.includes(m.id);
-                const isActive = state.settings.activeModelId === m.id;
-                
-                // --- Smart RAM Calculation ---
-                let currentCtx = 2048;
-                if (contextStrat === 1) currentCtx = m.safeLimit;
-                else if (contextStrat === 2) currentCtx = m.nativeLimit;
+        window.editLore = (i) => {
+            const item = state.sessions[state.currentSessionId].lore[i];
+            $('lore-name-input').value = item.name;
+            $('lore-desc-input').value = item.description;
+            $('add-lore-btn').textContent = "Update Card";
+            $('cancel-lore-btn').classList.remove('hidden');
+            $('lore-header-text').textContent = "Editing Card";
+            editingLoreIndex = i;
+        };
 
-                let reqRam = m.ram; // Base requirement for 2k
-                if (currentCtx > 2048) reqRam += 1; // 4k bump
-                if (currentCtx > 8192) reqRam += 4; // Large context bump
-                if (currentCtx > 32000) reqRam += 6; // Massive context bump
-                
-                const isRec = ram >= reqRam;
+        function resetLoreForm() {
+            $('lore-name-input').value = '';
+            $('lore-desc-input').value = '';
+            $('add-lore-btn').textContent = "Add to Context";
+            $('cancel-lore-btn').classList.add('hidden');
+            $('lore-header-text').textContent = "Create Persona Card";
+            editingLoreIndex = -1;
+        }
 
-                // UI Classes
-                let ctxClass = "text-gray-500";
-                if (contextStrat === 1) ctxClass = "text-blue-400";
-                else if (contextStrat === 2) ctxClass = "text-red-500 font-bold";
+        $('add-lore-btn').onclick = () => {
+            const n = $('lore-name-input').value.trim(), d = $('lore-desc-input').value.trim();
+            if(!n) return;
+            const session = state.sessions[state.currentSessionId];
+            if(editingLoreIndex > -1) session.lore[editingLoreIndex] = { name: n, description: d };
+            else session.lore.push({ name: n, description: d });
+            saveState(); resetLoreForm(); renderLore();
+        };
+        $('cancel-lore-btn').onclick = resetLoreForm;
+        window.delLore = (i) => { state.sessions[state.currentSessionId].lore.splice(i,1); saveState(); renderLore(); };
 
-                const ctxWarning = contextStrat === 2 && m.nativeLimit >= 32000 ? "⚠️" : "";
+        // --- MODEL RENDERING ---
+        function updateContextUI(val) {
+            const labels = ["MINIMAL", "SAFE", "ULTIMATE"];
+            $('ctx-label').textContent = labels[val];
+            $('ctx-label').className = `font-mono font-bold text-xs ${val==2?'text-red-500':(val==1?'text-blue-400':'text-gray-400')}`;
+            state.settings.contextStrategy = parseInt(val); saveState(); renderModels();
+        }
 
-                oList.innerHTML += `
-                    <div class="bg-gray-800 p-3 rounded-lg border ${isActive ? 'border-green-500' : 'border-gray-700'} relative overflow-hidden transition">
-                        <div class="flex justify-between items-start mb-2">
+        function renderModels() {
+             let html = "";
+             const strategy = state.settings.contextStrategy;
+             OFFLINE_MODELS.forEach(m => {
+                 const currentCtxLimit = m.limits[strategy];
+                 let effectiveReqRam = m.reqRam + (strategy === 2 && m.limits[2] > 8192 ? 2 : 0);
+                 const isSafe = deviceRam >= effectiveReqRam;
+                 const isDownloaded = state.downloadedModels.includes(m.id);
+                 const isActive = state.settings.activeModelId === m.id;
+
+                 let border = isActive ? 'border-green-500/50 bg-green-900/10' : (isSafe ? 'border-gray-700 bg-gray-900/20' : 'border-red-900/50 bg-red-900/5');
+                 let badge = isActive ? 'bg-green-900/30 text-green-300' : (isSafe ? 'bg-gray-800 text-gray-400' : 'bg-red-900/20 text-red-400');
+                 let warning = (strategy === 2 && currentCtxLimit > 10000) ? `<i class="ri-fire-fill text-orange-500 ml-1"></i>` : '';
+
+                 html += `
+                    <div class="p-3 rounded-xl border ${border} transition relative hover:border-opacity-100">
+                        <div class="flex justify-between items-center mb-1">
                             <div>
                                 <div class="text-xs font-bold text-gray-200">${m.name}</div>
-                                <div class="flex gap-1 mt-1">
-                                    <span class="text-[9px] px-1 rounded border ${isRec ? 'border-green-800 text-green-500 bg-green-900/20' : 'border-red-800 text-red-500 bg-red-900/20'}">Req: ${reqRam}GB</span>
-                                    <span class="text-[9px] px-1 rounded border border-gray-700 ${ctxClass}">Ctx: ${currentCtx} ${ctxWarning}</span>
-                                    ${m.tags.map(t=>`<span class="text-[9px] px-1 rounded border border-gray-700 text-gray-500">${t}</span>`).join('')}
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <span class="text-[9px] px-1.5 py-0.5 rounded border border-white/5 ${badge} font-mono">Req:${m.reqRam}GB</span>
+                                    <span class="text-[9px] px-1.5 py-0.5 rounded border border-gray-700 text-gray-400 font-mono">Ctx:${currentCtxLimit}${warning}</span>
                                 </div>
                             </div>
                             <div class="flex gap-2">
                                 ${isDownloaded ? 
-                                    `<button class="p-2 text-red-500 hover:text-red-400" onclick="deleteLocal('${m.id}')" title="Delete"><i class="ri-delete-bin-line"></i></button>
-                                     <button class="px-3 py-1 text-xs rounded-md ${isActive ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'}" onclick="setActive('${m.id}')">${isActive?'Active':'Load'}</button>` 
-                                    : 
-                                    `<button class="px-3 py-1 text-xs rounded-md bg-blue-600 hover:bg-blue-500 text-white shadow-lg" onclick="downloadModel('${m.id}')"><i class="ri-download-cloud-2-line"></i> Get</button>`
+                                    `<button class="w-8 h-8 rounded-full bg-gray-800 hover:bg-red-900/50 hover:text-red-400 flex items-center justify-center transition border border-gray-700" onclick="window.deleteLocal('${m.id}')"><i class="ri-delete-bin-line"></i></button>
+                                     <button class="px-4 py-1.5 text-xs font-bold rounded-lg transition shadow-lg ${isActive ? 'bg-green-600 text-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'}" onclick="window.setActive('${m.id}')">${isActive?'Active':'Load'}</button>` 
+                                    : `<button class="px-4 py-1.5 text-xs font-bold rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition" onclick="window.downloadModel('${m.id}')"><i class="ri-download-cloud-line mr-1"></i> Get</button>`
                                 }
                             </div>
                         </div>
                     </div>`;
-            });
-        }
-        
-        function updateContextUI(val) {
-             const labels = ["MINIMAL", "SAFE", "ULTIMATE"];
-             const descs = [
-                 "Hard cap at 2048 tokens. Stable on all devices.",
-                 "Safe 'Sweet Spot'. 4k for newer models, 2k for heavy ones.",
-                 "UNLEASHED. Full native context (up to 128k). WARNING: MAY CRASH BROWSER."
-             ];
-             const colors = ["text-gray-400", "text-blue-400", "text-red-500 animate-pulse"];
-             
-             $('ctx-label').textContent = labels[val];
-             $('ctx-label').className = `font-mono font-bold ${colors[val]}`;
-             $('ctx-desc').textContent = descs[val];
-             
-             renderModels();
+             });
+             $('offline-list').innerHTML = html;
         }
 
-        function renderSessions() {
-            const list = $('session-list');
-            const search = $('session-search').value.toLowerCase();
-            list.innerHTML = '';
-            
-            const sorted = Object.values(state.sessions).sort((a,b) => b.created - a.created);
-            
-            sorted.forEach(s => {
-                if(search && !s.name.toLowerCase().includes(search)) return;
-                
-                const isActive = s.id === state.currentSessionId;
-                const div = document.createElement('div');
-                div.className = `p-3 rounded-lg flex justify-between items-center cursor-pointer transition mb-1 group ${isActive ? 'bg-blue-900/20 border border-blue-900/50' : 'hover:bg-gray-800 border border-transparent'}`;
-                div.innerHTML = `
-                    <div class="overflow-hidden mr-2">
-                        <div class="text-xs font-medium text-gray-200 truncate">${s.name}</div>
-                        <div class="text-[10px] text-gray-500 truncate">${new Date(s.created).toLocaleDateString()} &bull; ${s.history.length} msgs</div>
-                    </div>
-                    <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                         <button class="p-1 text-gray-400 hover:text-white ren-btn"><i class="ri-pencil-line"></i></button>
-                         <button class="p-1 text-red-500 hover:text-red-400 del-btn"><i class="ri-delete-bin-line"></i></button>
-                    </div>
-                `;
-                
-                div.onclick = (e) => {
-                    if(e.target.closest('.del-btn')) {
-                        if(confirm('Delete chat?')) { delete state.sessions[s.id]; if(isActive) createSession(); else { saveState(); renderSessions(); } }
-                        return;
-                    }
-                    if(e.target.closest('.ren-btn')) {
-                        const newName = prompt("Rename:", s.name);
-                        if(newName) { state.sessions[s.id].name = newName; saveState(); renderSessions(); }
-                        return;
-                    }
-                    state.currentSessionId = s.id;
-                    if(s.system) $('system-prompt-input').value = s.system;
-                    else $('system-prompt-input').value = "";
-                    
-                    saveState();
-                    renderChat();
-                    renderSessions();
-                    $('control-panel').classList.add('hidden');
-                };
-                list.appendChild(div);
-            });
-        }
-
-        function renderChat() {
-            const c = $('chat-container');
-            const session = state.sessions[state.currentSessionId];
-            
-            if (!session || !session.history.length) {
-                c.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full text-gray-700 mt-20 opacity-60">
-                        <i class="ri-robot-2-line text-5xl mb-3"></i>
-                        <p class="text-sm">Select a model & start typing.</p>
-                    </div>`;
-                return;
+        async function initEngine(modelId) {
+            // CHECK: If model is already loaded, skip reload
+            if (modelId === loadedModelId && engine && modelLoaded) {
+                 ui.toast("Model already ready", "success");
+                 return;
             }
 
-            c.innerHTML = '';
-            session.history.forEach((msg, idx) => {
-                const isUser = msg.role === 'user';
-                const wrapper = document.createElement('div');
-                wrapper.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'} fade-in`;
-                
-                const bubble = document.createElement('div');
-                bubble.className = `max-w-[90%] md:max-w-[80%] px-4 py-3 text-sm shadow-md ${isUser ? 'msg-user' : 'msg-ai'}`;
-                
-                if (msg.role === 'pending') {
-                    bubble.innerHTML = '<div class="flex gap-1"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';
-                } else if (isUser) {
-                    bubble.textContent = msg.content;
-                } else {
-                    try {
-                        let cleanContent = msg.content;
-                        if(cleanContent.startsWith('[System Instruction:')) {
-                        }
-                        
-                        bubble.innerHTML = `<div class="prose prose-invert">${marked.parse(cleanContent)}</div>`;
-                        bubble.querySelectorAll('pre code').forEach((el) => {
-                            hljs.highlightElement(el);
-                        });
-                    } catch (e) {
-                        bubble.textContent = msg.content; 
-                    }
-                }
-                
-                wrapper.appendChild(bubble);
-                c.appendChild(wrapper);
-            });
-            
-            updateHeader();
+            const m = OFFLINE_MODELS.find(x => x.id === modelId);
+            const limit = m.limits[state.settings.contextStrategy];
+            ui.showLoader(true, `Loading ${m.name}`, `Context: ${limit} tokens`);
+            try {
+                if (!engine) engine = new webllm.MLCEngine();
+                engine.setInitProgressCallback((r) => { $('loader-bar').style.width = (r.progress * 100) + '%'; $('loader-text').textContent = r.text; });
+                await engine.reload(modelId, { context_window_size: limit, temperature: parseFloat(state.settings.temperature) });
+                modelLoaded = true; 
+                loadedModelId = modelId; // MARK: Set global loaded ID
+                ui.toast(`Ready (${limit} ctx)`, "success");
+            } catch (e) { 
+                handleUnresponsive(e);
+            } finally { ui.showLoader(false); }
         }
+
+        async function downloadModel(id) {
+            if(isDownloading) return; isDownloading = true;
+            ui.showLoader(true, "Downloading Model", "Connecting...");
+            try {
+                if (!engine) engine = new webllm.MLCEngine();
+                engine.setInitProgressCallback((r) => { $('loader-bar').style.width = (r.progress*100)+'%'; $('loader-text').textContent = r.text; });
+                await engine.reload(id);
+                if(!state.downloadedModels.includes(id)) state.downloadedModels.push(id);
+                await saveState(); renderModels(); ui.toast("Download Complete", "success");
+            } catch (e) { ui.toast("Error: " + e.message, "error"); } finally { ui.showLoader(false); isDownloading = false; }
+        }
+
+        // --- CHAT GENERATION & FALLBACK ---
+        window.quickAction = (text) => { $('user-input').value = text; $('user-input').focus(); };
+
+        async function generateResponse() {
+            const inputEl = $('user-input'), txt = inputEl.value.trim();
+            if (!txt) return;
+            const session = state.sessions[state.currentSessionId], activeId = state.settings.activeModelId;
+            if(!activeId) { ui.toast("Select a model in settings", "error"); togglePanel(true); switchTab('models'); return; }
+            if(activeId !== 'cloud' && (!engine || !modelLoaded)) { ui.toast("Model not loaded", "error"); return; }
+
+            inputEl.value = ''; const btn = $('send-btn'); btn.disabled = true; btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i>';
+            session.history.push({ role: 'user', content: txt });
+            appendMessage({ role: 'user', content: txt });
+            const aiBubbleId = appendMessage({ role: 'assistant', content: '' }, true);
+
+            try {
+                let loreTxt = session.lore.map(l => `${l.name}: ${l.description}`).join('\n');
+                let sys = (session.system || $('system-prompt-input').value || "You are a helpful AI.") + (loreTxt ? `\n\nCONTEXT:\n${loreTxt}` : "");
+                let msgs = [{ role: "system", content: sys }, ...session.history.slice(0, -1)];
+
+                let fullContent = "";
+                if(activeId === 'cloud') {
+                    fullContent = await callCloudWithFallback(msgs);
+                    updateAiMessage(aiBubbleId, fullContent);
+                } else {
+                    const chunks = await engine.chat.completions.create({ messages: msgs, temperature: parseFloat(state.settings.temperature), stream: true });
+                    let counter = 0;
+                    for await (const chunk of chunks) {
+                        fullContent += chunk.choices[0]?.delta?.content || "";
+                        if(++counter % 2 === 0) updateAiMessage(aiBubbleId, fullContent, true);
+                    }
+                    updateAiMessage(aiBubbleId, fullContent);
+                }
+                session.history.push({ role: 'assistant', content: fullContent });
+                if (session.history.length === 2 && session.name === "New Chat") { session.name = txt.substring(0, 30); renderSessions(); }
+                await saveState();
+            } catch (e) {
+                document.getElementById(aiBubbleId)?.parentElement.remove();
+                handleUnresponsive(e);
+                inputEl.value = txt; 
+            } finally { btn.disabled = false; btn.innerHTML = '<i class="ri-arrow-up-line text-xl"></i>'; }
+        }
+
+        async function callCloudWithFallback(messages) {
+             const tryCall = async (key, isBackup=false) => {
+                 if(!key) throw new Error("API Key Missing");
+                 const prov = detectProvider(key);
+                 let url, body, headers;
+                 
+                 // USE CUSTOM ENDPOINT IF AVAILABLE, ELSE AUTO-DETECT
+                 let baseEndpoint = state.cloud.endpoint;
+                 if(!baseEndpoint) baseEndpoint = prov === 'google' ? "https://generativelanguage.googleapis.com/v1beta/models" : (prov === 'openrouter' ? "https://openrouter.ai/api/v1/chat/completions" : "https://api.deepseek.com/chat/completions");
+
+                 if(prov === 'google') {
+                     const contents = messages.filter(m=>m.role!=='system').map(m=>({ role: m.role==='assistant'?'model':'user', parts: [{text: m.content}] }));
+                     const sys = messages.find(m=>m.role==='system')?.content;
+                     if(sys && contents.length) contents[0].parts[0].text = "System: "+sys+"\n\n"+contents[0].parts[0].text;
+                     
+                     let mName = state.cloud.targetModel.includes('/') ? state.cloud.targetModel.split('/')[1] : (state.cloud.targetModel || "gemini-2.0-flash-lite-preview-02-05");
+                     
+                     // Construct Google URL safely
+                     if (baseEndpoint.includes(':generateContent')) url = `${baseEndpoint}?key=${key}`;
+                     else url = `${baseEndpoint}/${mName}:generateContent?key=${key}`;
+
+                     body = JSON.stringify({ contents }); headers = {'Content-Type': 'application/json'};
+                 } else {
+                     url = baseEndpoint; // Direct use for OpenAI compatible
+                     headers = { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' };
+                     if(prov === 'openrouter') { headers['HTTP-Referer'] = window.location.href; headers['X-Title'] = 'CWAI 1.2.5'; }
+                     body = JSON.stringify({ model: state.cloud.targetModel || 'gpt-3.5-turbo', messages, temperature: parseFloat(state.settings.temperature) });
+                 }
+                 const res = await fetch(url, { method: 'POST', headers, body });
+                 const d = await res.json();
+                 if(!res.ok || d.error) throw new Error(d.error?.message || "API Error");
+                 return prov === 'google' ? d.candidates[0].content.parts[0].text : d.choices[0].message.content;
+             };
+             try { return await tryCall(state.cloud.primary); } 
+             catch(e) { if(state.cloud.backup) { ui.toast("Primary failed, using Backup...", "info"); return await tryCall(state.cloud.backup, true); } throw e; }
+        }
+
+        function handleUnresponsive(e) {
+            ui.toast("Model Error: " + e.message, "error");
+            togglePanel(true); switchTab('models');
+            state.settings.activeModelId = null; updateHeader();
+        }
+
+        function detectProvider(key) { if(!state.cloud.autoDetect) return 'openrouter'; if(key.startsWith('AIza')) return 'google'; if(key.startsWith('sk-or-')) return 'openrouter'; if(key.startsWith('sk-')) return 'deepseek'; return 'openrouter'; }
+
+        // --- SESSIONS (Updated 1.2.5 Logic) ---
+        function renderSessions() {
+            const list = $('session-list'); list.innerHTML = '';
+            const term = $('session-search').value.toLowerCase();
+            Object.values(state.sessions).sort((a,b)=>b.created-a.created).forEach(s => {
+                if(term && !s.name.toLowerCase().includes(term)) return;
+                const d = document.createElement('div');
+                d.className = `p-3 rounded-lg flex justify-between items-center cursor-pointer mb-1 transition group ${s.id===state.currentSessionId ? 'bg-blue-600/20 border border-blue-500/30' : 'hover:bg-gray-800 border border-transparent'}`;
+                d.innerHTML = `
+                    <div class="overflow-hidden mr-2 flex-1"><div class="text-xs font-medium text-gray-200 truncate group-hover:text-white">${s.name}</div><div class="text-[10px] text-gray-500">${new Date(s.created).toLocaleDateString()}</div></div>
+                    <div class="flex gap-1 pl-2">
+                         <button class="rename-btn p-1.5 text-gray-500 hover:text-blue-300" title="Rename"><i class="ri-pencil-line"></i></button>
+                         <button class="copy-btn p-1.5 text-gray-500 hover:text-green-300" title="Copy"><i class="ri-file-copy-line"></i></button>
+                         <button class="del-btn p-1.5 text-gray-500 hover:text-red-400" title="Delete"><i class="ri-delete-bin-line"></i></button>
+                    </div>`;
+                d.onclick = (e) => {
+                    e.stopPropagation();
+                    const btn = e.target.closest('button');
+                    if(btn) {
+                        if(btn.classList.contains('del-btn')) { 
+                            if(confirm('Delete chat permanently?')) { delete state.sessions[s.id]; if(s.id===state.currentSessionId) createSession(); else { saveState(); renderSessions(); } } 
+                        }
+                        else if(btn.classList.contains('copy-btn')) {
+                            const newId = Date.now().toString(); state.sessions[newId] = {...s, id: newId, created: Date.now(), name: "Copy of " + s.name};
+                            saveState(); renderSessions(); ui.toast("Chat Copied");
+                        }
+                        else if(btn.classList.contains('rename-btn')) {
+                            const newName = prompt("Rename Chat:", s.name);
+                            if(newName && newName.trim()) { state.sessions[s.id].name = newName.trim(); saveState(); renderSessions(); }
+                        }
+                        return;
+                    }
+                    state.currentSessionId = s.id; if(s.system) $('system-prompt-input').value = s.system; 
+                    renderChat(); renderLore(); renderSessions(); if(window.innerWidth<768) togglePanel(false);
+                };
+                list.appendChild(d);
+            });
+        }
+
+        // --- DOM RENDERERS ---
+        function appendMessage(msg, isThinking=false) {
+            const c = $('chat-container'); const isUser = msg.role === 'user';
+            const div = document.createElement('div'); const id = 'msg-' + Date.now() + Math.random();
+            div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'} animate-enter-message mb-6`;
+            div.innerHTML = `<div id="${id}" class="max-w-[90%] md:max-w-[85%] px-5 py-3.5 text-sm shadow-md leading-relaxed ${isUser ? 'msg-user' : 'msg-ai'}">${isThinking ? '<div class="flex gap-1 py-1"><span class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></span><span class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce delay-100"></span><span class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce delay-200"></span></div>' : (isUser ? msg.content : marked.parse(msg.content))}</div>`;
+            c.appendChild(div); scrollToBottom(); return id;
+        }
+        function updateAiMessage(id, content, streaming=false) {
+            const el = document.getElementById(id); if(!el) return;
+            el.innerHTML = `<div class="prose prose-invert">${marked.parse(content + (streaming ? ' ▍' : ''))}</div>`;
+            if(!streaming) { el.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b)); addCopyButtons(el); }
+            scrollToBottom();
+        }
+        function addCopyButtons(el) { el.querySelectorAll('pre').forEach(pre => { if(pre.querySelector('.copy-code-btn')) return; const btn = document.createElement('button'); btn.className='copy-code-btn'; btn.textContent='Copy'; btn.onclick = () => { navigator.clipboard.writeText(pre.querySelector('code').innerText); btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',2000); }; pre.appendChild(btn); }); }
+        function scrollToBottom() { const c = $('chat-container'); if(c.scrollHeight - c.scrollTop - c.clientHeight < 200) c.scrollTop = c.scrollHeight; }
+
+        // --- EXPORTS & EVENTS ---
+        function createSession() { const id = Date.now().toString(); state.sessions[id] = { id, name: "New Chat", history: [], created: Date.now(), system: "", lore: [] }; state.currentSessionId = id; saveState(); renderSessions(); renderChat(); renderLore(); }
+        async function saveState() { await set(DB_KEY, state); }
+
+        window.setActive = async (id) => { state.settings.activeModelId = id; await saveState(); renderModels(); updateHeader(); if(id!=='cloud') await initEngine(id); else ui.toast("Cloud Active"); };
+        window.deleteLocal = async (id) => { if(confirm("Delete cache?")) { state.downloadedModels = state.downloadedModels.filter(x=>x!==id); if(state.settings.activeModelId===id) state.settings.activeModelId=null; await saveState(); renderModels(); updateHeader(); }};
+        window.downloadModel = downloadModel;
         
         function updateHeader() {
-            const mId = state.settings.activeModelId;
-            const s = state.sessions[state.currentSessionId];
-            
-            if(s) {
-                const estTokens = JSON.stringify(s.history).length / 4;
-                const m = OFFLINE_MODELS.find(x=>x.id===mId);
-                const limit = m ? getEffectiveContextLimit(m) : 4000;
-                
-                const pct = Math.floor((estTokens / limit) * 100);
-                const tDisp = $('token-display');
-                tDisp.textContent = `CTX: ${pct}%`;
-                tDisp.className = `ml-2 pl-2 border-l border-gray-700 font-mono text-[9px] ${pct > 80 ? 'text-red-500 animate-pulse' : 'text-gray-500'}`;
-            }
-
-            const nameEl = $('current-model-name');
-            const dot = $('status-dot');
-            
-            if(!mId) {
-                nameEl.textContent = "Select Model";
-                dot.className = "w-2 h-2 rounded-full bg-red-500";
-            } else {
-                const local = OFFLINE_MODELS.find(m=>m.id===mId);
-                const cloud = state.models[mId];
-                if(local) {
-                    nameEl.textContent = local.name + " (Local)";
-                    dot.className = "w-2 h-2 rounded-full bg-green-500 shadow-lg shadow-green-500/50";
-                } else if(cloud) {
-                    nameEl.textContent = cloud.name + " (Cloud)";
-                    dot.className = "w-2 h-2 rounded-full bg-blue-500 shadow-lg shadow-blue-500/50";
-                }
-            }
+            const mId = state.settings.activeModelId; const n = $('current-model-name'); const d = $('status-dot');
+            if(!mId) { n.textContent = "Select Model"; d.className = "w-1.5 h-1.5 rounded-full bg-red-500"; }
+            else if (mId === 'cloud') { n.textContent = `Cloud (${detectProvider(state.cloud.primary)})`; d.className = "w-1.5 h-1.5 rounded-full bg-blue-400"; }
+            else { const m = OFFLINE_MODELS.find(x=>x.id===mId); n.textContent = m?m.name:"Local"; d.className = "w-1.5 h-1.5 rounded-full bg-green-500"; }
         }
 
-        // --- Global Accessors ---
-        window.setActive = async (id) => {
-            state.settings.activeModelId = id;
-            await saveState();
-            renderModels();
-            updateHeader();
+        // --- UPDATED TAB SWITCHING WITH ANIMATION ---
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => { 
+                b.classList.remove('text-blue-400', 'active-tab'); 
+                b.classList.add('text-gray-500'); 
+                if(b.dataset.tab===tabName) { b.classList.add('text-blue-400', 'active-tab'); b.classList.remove('text-gray-500'); } 
+            });
             
-            const isLocal = OFFLINE_MODELS.find(m => m.id === id);
-            if (isLocal && state.downloadedModels.includes(id)) {
-                await initEngine(id);
-            }
-        };
+            // Hide all tabs
+            ['models','lore','data','system'].forEach(t => {
+                const el = $(`tab-${t}`);
+                el.classList.add('hidden');
+                el.classList.remove('animate-slide-in'); // Reset animation
+            });
+            
+            // Show new tab with animation
+            const target = $(`tab-${tabName}`);
+            target.classList.remove('hidden');
+            // Trigger reflow to restart animation
+            void target.offsetWidth; 
+            target.classList.add('animate-slide-in');
+        }
 
-        window.deleteLocal = async (id) => {
-            if(!confirm("Remove model from cache?")) return;
-            state.downloadedModels = state.downloadedModels.filter(x => x !== id);
-            if(state.settings.activeModelId === id) state.settings.activeModelId = null;
-            await saveState();
-            renderModels();
-            updateHeader();
-        };
-
-        window.editCloud = (id) => {
-            const m = state.models[id];
-            $('api-name').value = m.name;
-            $('api-url').value = m.url;
-            $('api-key').value = m.key;
-            $('api-id-hidden').value = id;
-            $('key-modal').classList.remove('hidden');
-        };
-        
-        window.downloadModel = downloadModel;
-
-        // --- Event Listeners ---
         $('send-btn').onclick = generateResponse;
-        $('user-input').onkeydown = (e) => { 
-            if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); generateResponse(); } 
-        };
+        $('user-input').onkeydown = (e) => { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault(); generateResponse();} };
+        $('header-menu-btn').onclick = () => { renderModels(); renderSessions(); togglePanel(true); };
         
-        $('user-input').oninput = (e) => {
-            state.draft = e.target.value;
-            $('typing-indicator').classList.remove('hidden');
-            clearTimeout(window.saveTimeout);
-            window.saveTimeout = setTimeout(async () => {
-                await saveState();
-                $('typing-indicator').classList.add('hidden');
-            }, 1000);
-        };
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.onclick = () => switchTab(btn.dataset.tab));
 
-        $('mic-btn').onclick = startListening;
+        $('ctx-slider').oninput = (e) => updateContextUI(e.target.value);
+        $('temp-slider').oninput = (e) => { $('temp-val').textContent = e.target.value; state.settings.temperature = e.target.value; };
         
-        $('header-menu-btn').onclick = () => { 
-            renderModels(); renderSessions(); 
-            $('control-panel').classList.remove('hidden'); 
+        $('activate-cloud-btn').onclick = () => { 
+            state.cloud.primary=$('cloud-key-primary').value.trim(); 
+            state.cloud.backup=$('cloud-key-backup').value.trim(); 
+            state.cloud.targetModel=$('cloud-model-id').value.trim(); 
+            state.cloud.endpoint=$('cloud-endpoint').value.trim(); // SAVE ENDPOINT
+            state.cloud.autoDetect=$('auto-detect-toggle').checked; 
+            window.setActive('cloud'); 
         };
-        $('close-panel-btn').onclick = () => $('control-panel').classList.add('hidden');
+
+        $('float-toggle-btn').onclick = () => { const i=$('floating-items'), b=$('float-toggle-btn').querySelector('i'); if(i.classList.contains('pointer-events-none')){ i.classList.remove('opacity-0','translate-y-4','pointer-events-none','scale-95'); b.classList.add('rotate-45'); } else { i.classList.add('opacity-0','translate-y-4','pointer-events-none','scale-95'); b.classList.remove('rotate-45'); }};
+        $('float-new-btn').onclick = () => { createSession(); $('float-toggle-btn').click(); };
         
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.onclick = () => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                ['models', 'data', 'system'].forEach(t => $(`tab-${t}`).classList.add('hidden'));
-                $(`tab-${btn.dataset.tab}`).classList.remove('hidden');
-            };
-        });
-
-        $('temp-slider').oninput = (e) => { 
-            $('temp-val').textContent = e.target.value; 
-            state.settings.temperature = e.target.value; 
-        };
-        $('temp-slider').onchange = saveState;
-        
-        $('ctx-slider').oninput = async (e) => {
-            const val = parseInt(e.target.value);
-            state.settings.contextStrategy = val; 
-            updateContextUI(val);
-        };
-        $('ctx-slider').onchange = async (e) => {
-            await saveState(); 
-            ui.toast("Context limit updated. Reload model to apply.", "info");
+        $('float-voice-btn').onclick = () => { state.settings.tts = !state.settings.tts; ui.toast(state.settings.tts?"Voice On":"Voice Off"); };
+        $('mic-btn').onclick = () => {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition; if(!SR) return ui.toast("No Voice Support","error");
+            const r = new SR(); r.continuous=false; r.onstart=()=>$('mic-btn').classList.add('text-red-500','animate-pulse'); r.onend=()=>$('mic-btn').classList.remove('text-red-500','animate-pulse');
+            r.onresult=(e)=>$('user-input').value+=(($('user-input').value?' ':'')+e.results[0][0].transcript); r.start();
         };
 
-        
-        $('fallback-toggle').onchange = (e) => { 
-            state.settings.fallback = e.target.checked; 
-            saveState(); 
-        };
-
-        $('header-focus-btn').onclick = () => ui.toggleFocus(true);
-        $('focus-exit-btn').onclick = () => ui.toggleFocus(false);
-        
-        $('header-voice-toggle').onclick = () => {
-            state.settings.tts = !state.settings.tts;
-            updateVoiceIcon();
-            saveState();
-        };
-
-        function updateVoiceIcon() {
-            const i = $('voice-icon');
-            if(state.settings.tts) { i.className = "ri-volume-up-line text-blue-400"; }
-            else { i.className = "ri-volume-mute-line"; }
-        }
-
-        $('float-toggle-btn').onclick = () => {
-            const items = $('floating-items');
-            items.classList.toggle('hidden'); items.classList.toggle('flex');
-        };
-        $('float-new-btn').onclick = () => { createSession(); $('floating-items').classList.add('hidden'); };
-        $('float-copy-btn').onclick = () => {
-            const s = state.sessions[state.currentSessionId];
-            const txt = s.history.map(m=>`${m.role.toUpperCase()}: ${m.content}`).join('\n\n');
-            navigator.clipboard.writeText(txt);
-            ui.toast("Chat Copied");
-        };
-
-        $('cancel-key-btn').onclick = () => $('key-modal').classList.add('hidden');
-        $('save-key-btn').onclick = async () => {
-            const id = $('api-id-hidden').value;
-            state.models[id].name = $('api-name').value;
-            state.models[id].url = $('api-url').value;
-            state.models[id].key = $('api-key').value;
-            await saveState();
-            renderModels();
-            $('key-modal').classList.add('hidden');
-        };
-        $('add-cloud-model-btn').onclick = () => {
-            const id = "custom-" + Date.now();
-            state.models[id] = { id, name: "New Model", url: "", key: "", provider: "openai" };
-            editCloud(id);
-        };
-
-        $('export-btn').onclick = () => {
-            const blob = new Blob([JSON.stringify(state, null, 2)], {type : 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href=url; a.download=`cwai_backup_${Date.now()}.json`;
-            a.click();
-        };
-        $('import-btn').onclick = () => $('import-modal').classList.remove('hidden');
-        
-        $('confirm-import-btn').onclick = async () => {
-            try {
-                let d = JSON.parse($('import-area').value);
-                
-                if (!d.sessions && !d.models && Object.keys(d).some(k => k.length > 20)) {
-                    const newSessions = {};
-                    for (const [key, val] of Object.entries(d)) {
-                        if (typeof val === 'object' && val.name) {
-                            const convertedHistory = [];
-                            if(val.history) {
-                                val.history.forEach(msg => {
-                                    if(msg.parts && msg.parts[0]) {
-                                        convertedHistory.push({ role: msg.role === 'model' ? 'assistant' : msg.role, content: msg.parts[0].text });
-                                    }
-                                });
-                            } else if (val.chatHistory) {
-                                val.chatHistory.forEach(msg => {
-                                    if(msg.parts && msg.parts[0]) {
-                                        convertedHistory.push({ role: msg.role === 'model' ? 'assistant' : msg.role, content: msg.parts[0].text });
-                                    }
-                                });
-                            }
-                            const sys = val.instructions || val.aiInstructions || "";
-                            newSessions[key] = {
-                                id: key,
-                                name: val.name,
-                                history: convertedHistory,
-                                created: val.lastModified || Date.now(),
-                                system: sys
-                            };
-                        }
-                    }
-                    d = { sessions: newSessions };
-                }
-
-                if(confirm("Merge this data?")) {
-                    if(d.sessions) {
-                        state.sessions = { ...state.sessions, ...d.sessions };
-                    }
-                    if(d.models) {
-                        state.models = { ...state.models, ...d.models };
-                    }
-                    await saveState();
-                    window.location.reload();
-                }
-            } catch(e) { 
-                console.error(e);
-                ui.toast("Invalid or Incompatible JSON", "error"); 
-            }
-        };
-
-        $('cancel-dl-btn').onclick = () => { isDownloading = false; $('download-modal').classList.add('hidden'); };
-        $('cancel-load-btn').onclick = () => { window.location.reload(); };
-        
-        $('wipe-data-btn').onclick = async () => {
-            if(confirm("PERMANENTLY DELETE ALL CHATS AND KEYS?")) {
-                await del(DB_KEY);
-                window.location.reload();
-            }
-        };
-
-        $('session-search').oninput = renderSessions;
-        
-        $('system-prompt-input').oninput = async () => {
-             const s = state.sessions[state.currentSessionId];
-             if(s) {
-                 s.system = $('system-prompt-input').value;
-                 clearTimeout(window.sysSaveTimeout);
-                 window.sysSaveTimeout = setTimeout(saveState, 1000);
-             }
-        };
-
-        window.onload = loadState;
-
-        // --- SERVICE WORKER REGISTRATION (Added by Gemini) ---
+        // --- NEW: SERVICE WORKER UPDATE HANDLER ---
+        let newWorker;
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker Registered!', reg.scope))
-                    .catch(err => console.log('Service Worker Fail:', err));
+            navigator.serviceWorker.register('./sw.js').then(reg => {
+                reg.addEventListener('updatefound', () => {
+                    newWorker = reg.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // Show Update Toast
+                            const t = $('update-toast');
+                            t.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+                        }
+                    });
+                });
             });
         }
+        $('update-btn').onclick = () => { if(newWorker) newWorker.postMessage('SKIP_WAITING'); window.location.reload(); };
+
+        window.onload = loadState;
     </script>
 </body>
 </html>
