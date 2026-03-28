@@ -1,10 +1,9 @@
-// sw.js - CWAI 1.2.5.1
-const CACHE_NAME = 'cwai-v1.2.5.1';
+// sw.js - CWAI 1.4
+const CACHE_NAME = 'cwai-v1.4';
 
-// We add the Google Fonts here so your UI doesn't look "broken" if you go offline.
 const ASSETS = [
   './',
-  './index.html', // Make sure your main file is named index.html for this to work perfectly
+  './index.html',
   './manifest.json',
   // UI Assets
   'https://cdn.tailwindcss.com',
@@ -38,20 +37,15 @@ self.addEventListener('activate', (event) => {
 });
 
 // Fetch: Network-First with "Dynamic Cache Updating"
-// This is critical for Vibe Coding: If you edit your code, this saves the new version automatically.
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests (browsing, loading files)
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        // 1. If network works, return the fresh code...
-        // 2. AND save a copy to the cache for later!
         const responseClone = networkResponse.clone();
         
         caches.open(CACHE_NAME).then((cache) => {
-           // We only cache valid http/https requests (prevents errors with chrome-extensions)
            if (event.request.url.startsWith('http')) {
                cache.put(event.request, responseClone);
            }
@@ -60,7 +54,6 @@ self.addEventListener('fetch', (event) => {
         return networkResponse;
       })
       .catch(() => {
-        // 3. If network fails (offline), use the last cached version
         return caches.match(event.request);
       })
   );
