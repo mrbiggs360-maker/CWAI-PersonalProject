@@ -1,6 +1,6 @@
 {
-  "name": "CWAI",
-  "short_name": "CWAI",
+  "name": "CWAI 1.4",
+  "short_name": "CWAI 1.4",
   "start_url": "./",
   "id": "./index.html",
   "display": "standalone",
