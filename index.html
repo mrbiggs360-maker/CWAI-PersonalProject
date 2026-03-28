@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CWAI 1.2.5.1 | Neural Interface</title>
+    <title>CWAI 1.4 | Neural Interface</title>
+    
     <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#050505">
+    <link rel="apple-touch-icon" href="https://dummyimage.com/192x192/2563eb/ffffff.png&text=CWAI+1.4">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -23,21 +27,11 @@
                     fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
                     animation: {
                         'enter-message': 'slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'slide-in': 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'pop-in': 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
                     },
                     keyframes: {
                         slideUpFade: {
                             '0%': { opacity: 0, transform: 'translateY(10px) scale(0.98)' },
                             '100%': { opacity: 1, transform: 'translateY(0) scale(1)' },
-                        },
-                        slideInRight: {
-                            '0%': { opacity: 0, transform: 'translateX(10px)' },
-                            '100%': { opacity: 1, transform: 'translateX(0)' },
-                        },
-                        popIn: {
-                            '0%': { opacity: 0, transform: 'scale(0.9)' },
-                            '100%': { opacity: 1, transform: 'scale(1)' },
                         }
                     }
                 }
@@ -72,6 +66,12 @@
         .loader-bar-bg { overflow: hidden; position: relative; }
         .loader-bar-bg::after { content:''; position: absolute; top:0; left:0; bottom:0; right:0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transform: translateX(-100%); animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+        /* Focus Mode Styles */
+        body.focus-active #main-header { transform: translateY(-100%); }
+        body.focus-active #floating-menu { transform: translateY(150%); opacity: 0; }
+        body.focus-active .glass-heavy { border-top: none; background: transparent; backdrop-filter: none; pointer-events: none; }
+        body.focus-active .glass-heavy > div { pointer-events: auto; background: rgba(5,5,5,0.8); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col relative bg-black selection:bg-blue-500/30 selection:text-blue-200">
@@ -87,7 +87,7 @@
                 </svg>
             </div>
             <div>
-                <h1 class="text-sm font-bold text-gray-100 tracking-tight leading-none">CWAI 1.2.5.1</h1>
+                <h1 class="text-sm font-bold text-gray-100 tracking-tight leading-none">CWAI 1.4</h1>
                 <div id="header-model-status" class="text-[10px] text-gray-400 flex items-center gap-1 cursor-pointer hover:text-blue-400 transition mt-0.5">
                     <span class="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]" id="status-dot"></span>
                     <span id="current-model-name">No Model Loaded</span>
@@ -105,16 +105,9 @@
     </button>
 
     <div id="chat-container" class="flex-1 overflow-y-auto pt-20 pb-36 px-4 md:px-0 max-w-3xl mx-auto w-full space-y-6 custom-scroll scroll-smooth">
-        <div id="welcome-message" class="flex flex-col items-center justify-center h-[60vh] text-gray-600 fade-in">
-            <div class="w-20 h-20 rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center mb-6 shadow-2xl rotate-3 hover:rotate-0 transition duration-500 group">
-                 <i class="ri-cpu-line text-5xl text-gray-700 group-hover:text-blue-500 transition-colors"></i>
-            </div>
-            <h2 class="text-xl font-bold text-gray-300 mb-2">Neural Interface Ready</h2>
-            <p class="text-sm font-mono text-gray-500 text-center max-w-xs" id="ram-welcome-msg">Detecting Hardware...</p>
         </div>
-    </div>
 
-    <div class="fixed bottom-0 left-0 right-0 glass-heavy border-t border-gray-800 p-3 pb-5 z-20">
+    <div class="fixed bottom-0 left-0 right-0 glass-heavy border-t border-gray-800 p-3 pb-5 z-20 transition-all duration-300">
         <div class="max-w-3xl mx-auto flex flex-col gap-3">
             <div class="flex justify-center gap-6 pb-1 opacity-60 hover:opacity-100 transition duration-300">
                 <button onclick="quickAction('Suggest a creative idea')" class="text-[10px] text-gray-400 hover:text-purple-400 uppercase font-bold tracking-widest flex items-center gap-1.5"><i class="ri-lightbulb-flash-line"></i> Idea</button>
@@ -132,7 +125,7 @@
         </div>
     </div>
 
-    <div id="floating-menu" class="fixed bottom-36 right-6 z-30 flex flex-col items-end gap-3 pointer-events-none">
+    <div id="floating-menu" class="fixed bottom-36 right-6 z-30 flex flex-col items-end gap-3 pointer-events-none transition-transform duration-300">
         <div id="floating-items" class="flex flex-col gap-3 items-end mb-2 transition-all duration-300 opacity-0 translate-y-4 pointer-events-none scale-95 origin-bottom-right">
             <button id="float-new-btn" class="bg-gray-800 hover:bg-gray-700 text-gray-200 p-2 rounded-full shadow-lg border border-gray-700 w-11 h-11 flex items-center justify-center pointer-events-auto transition hover:scale-110" title="New Chat"><i class="ri-chat-new-line text-lg"></i></button>
             <button id="float-voice-btn" class="bg-gray-800 hover:bg-gray-700 text-gray-200 p-2 rounded-full shadow-lg border border-gray-700 w-11 h-11 flex items-center justify-center pointer-events-auto transition hover:scale-110" title="Toggle Voice"><i class="ri-volume-mute-line text-lg" id="float-voice-icon"></i></button>
@@ -159,7 +152,7 @@
 
         <div id="panel-content" class="flex-1 overflow-y-auto p-5 custom-scroll relative">
             
-            <div id="tab-models" class="space-y-6 animate-slide-in">
+            <div id="tab-models" class="space-y-6 fade-in">
                 <div class="bg-gray-900/40 rounded-xl p-4 border border-gray-800 hover:border-gray-700 transition">
                     <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-4 flex items-center gap-2"><i class="ri-cloud-line"></i> Cloud API</h3>
                     <div class="space-y-3 relative">
@@ -197,7 +190,14 @@
                 </div>
             </div>
 
-            <div id="tab-lore" class="hidden space-y-4">
+            <div id="tab-lore" class="hidden space-y-4 fade-in">
+                <div class="bg-gray-900/40 rounded-xl p-4 border border-gray-800 hover:border-gray-700 transition">
+                    <h3 class="text-xs font-bold text-green-400 uppercase tracking-wider mb-2 flex items-center gap-2"><i class="ri-history-line"></i> Story Recap</h3>
+                    <p class="text-[10px] text-gray-500 mb-2 leading-relaxed">The AI automatically summarizes your past 20 messages here.</p>
+                    <textarea id="story-recap-input" class="w-full h-32 bg-black/50 border border-gray-800 rounded-lg p-2.5 text-xs text-white resize-none focus:border-green-500 outline-none transition custom-scroll" placeholder="Story recap will appear here..."></textarea>
+                    <button onclick="saveRecap()" class="w-full py-2 bg-green-600/10 border border-green-600/20 text-green-400 text-xs font-bold rounded-lg hover:bg-green-600 hover:text-white transition mt-2">Save Recap Manually</button>
+                </div>
+                
                  <div class="bg-gray-900/40 rounded-xl p-4 border border-gray-800">
                     <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-3" id="lore-header-text">Create Persona Card</h3>
                     <input id="lore-name-input" type="text" placeholder="Character Name" class="w-full bg-black/50 border border-gray-800 rounded-lg p-2.5 text-xs text-white mb-2 focus:border-purple-500 outline-none">
@@ -210,7 +210,7 @@
                 <div id="lore-list" class="space-y-2 pb-4"></div>
             </div>
 
-            <div id="tab-data" class="hidden space-y-4">
+            <div id="tab-data" class="hidden space-y-4 fade-in">
                 <div class="relative">
                     <i class="ri-search-line absolute left-3 top-2.5 text-gray-500 text-sm"></i>
                     <input type="text" id="session-search" placeholder="Filter chats..." class="w-full bg-gray-900 border border-gray-800 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-300 focus:border-blue-500 outline-none transition">
@@ -225,7 +225,7 @@
                 <button id="import-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-white py-3 rounded-xl text-xs font-medium border border-gray-700 flex items-center justify-center gap-2 transition"><i class="ri-download-2-line text-lg"></i> Restore Backup</button>
             </div>
             
-            <div id="tab-system" class="hidden space-y-6">
+            <div id="tab-system" class="hidden space-y-6 fade-in">
                 <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
                     <div class="flex justify-between items-center mb-4">
                         <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Context Limit</span>
@@ -245,6 +245,7 @@
                         <span id="temp-val" class="text-blue-400 font-mono">0.7</span>
                     </div>
                     <input type="range" id="temp-slider" min="0" max="1" step="0.1" value="0.7" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                    <div class="flex justify-between text-[9px] text-gray-500 font-mono"><span>PRECISE</span><span>BALANCED</span><span>CREATIVE</span></div>
                 </div>
                 <button id="wipe-data-btn" class="w-full py-3 text-xs text-red-400 border border-red-900/30 bg-red-900/10 rounded-xl hover:bg-red-900/20 transition font-bold uppercase tracking-wider">Reset App Data</button>
             </div>
@@ -259,7 +260,7 @@
         <button id="cancel-load-btn" class="mt-8 text-gray-500 hover:text-white text-xs uppercase tracking-widest font-bold">Cancel</button>
     </div>
 
-    <div id="import-modal" class="hidden fixed inset-0 z-[90] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm animate-pop-in">
+    <div id="import-modal" class="hidden fixed inset-0 z-[90] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
         <div class="bg-gray-950 p-6 rounded-2xl border border-gray-800 w-full max-w-lg shadow-2xl flex flex-col h-[500px]">
             <h3 class="text-white font-bold mb-4 text-lg">Import Data</h3>
             <textarea id="import-area" class="flex-1 w-full bg-gray-900 border border-gray-800 rounded-xl p-4 text-xs text-gray-300 font-mono resize-none focus:border-blue-500 mb-4 outline-none" placeholder="Paste your backup JSON string here..."></textarea>
@@ -270,29 +271,24 @@
         </div>
     </div>
 
-    <div id="update-toast" class="fixed bottom-6 right-6 z-[120] translate-y-20 opacity-0 pointer-events-none transition-all duration-500 ease-out">
-        <div class="bg-gray-900/95 border border-blue-500/30 p-4 rounded-xl shadow-2xl backdrop-blur-xl flex items-center gap-4 max-w-sm">
-            <div class="bg-blue-600/20 p-2.5 rounded-full text-blue-400">
-                <i class="ri-refresh-line text-xl animate-spin"></i>
-            </div>
-            <div>
-                <h4 class="text-sm font-bold text-white">Update Available</h4>
-                <p class="text-xs text-gray-400">New version ready to install.</p>
-            </div>
-            <button id="update-btn" class="ml-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg shadow-lg transition">
-                Update
-            </button>
-        </div>
-    </div>
-
     <div id="toast-container" class="fixed top-20 right-4 z-[110] flex flex-col gap-2 pointer-events-none"></div>
 
+    <script>
+        // Lite: PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker registered successfully'))
+                .catch(err => console.error('Service Worker registration failed:', err));
+            });
+        }
+    </script>
     <script type="module">
         import * as webllm from "https://esm.run/@mlc-ai/web-llm";
         import { get, set, del } from 'https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm';
 
         // --- CONSTANTS ---
-        const DB_KEY = 'cwai_1_2_5_db';
+        const DB_KEY = 'cwai_1_4_db';
         const OFFLINE_MODELS = [
             { id: "TinyLlama-1.1B-Chat-v0.4-q4f32_1-MLC-1k", name: "TinyLlama 1.1B", reqRam: 2, tags: ["Fast", "Light"], limits: [1024, 2048, 2048] },
             { id: "gemma-2-2b-it-q4f32_1-MLC", name: "Gemma 2 2B", reqRam: 4, tags: ["Balanced", "Google"], limits: [2048, 4096, 8192] },
@@ -328,7 +324,6 @@
             settings: { activeModelId: null, temperature: 0.7, tts: false, contextStrategy: 1 },
             downloadedModels: []
         };
-        // ADDED: loadedModelId to track what is currently in VRAM
         let engine = null, isDownloading = false, modelLoaded = false, editingLoreIndex = -1, loadedModelId = null;
         let deviceRam = navigator.deviceMemory || 4;
         
@@ -349,8 +344,8 @@
             },
             toggleFocus(active) {
                 document.body.classList.toggle('focus-active', active);
-                if(active) { $('main-header').classList.add('-translate-y-full'); $('floating-menu').classList.add('translate-y-20', 'opacity-0'); $('focus-exit-btn').classList.remove('hidden'); }
-                else { $('main-header').classList.remove('-translate-y-full'); $('floating-menu').classList.remove('translate-y-20', 'opacity-0'); $('focus-exit-btn').classList.add('hidden'); }
+                if(active) { $('focus-exit-btn').classList.remove('hidden'); }
+                else { $('focus-exit-btn').classList.add('hidden'); }
             }
         };
 
@@ -363,7 +358,9 @@
         async function loadState() {
             try {
                 $('ram-badge').textContent = `RAM: ~${deviceRam}GB`;
-                $('ram-welcome-msg').textContent = `System: ${deviceRam}GB RAM detected.`;
+                // Restore draft
+                $('user-input').value = localStorage.getItem('cwai_draft') || '';
+
                 const data = await get(DB_KEY);
                 if (data) state = { ...state, ...data, sessions: data.sessions || {}, cloud: { ...state.cloud, ...data.cloud } };
 
@@ -372,15 +369,19 @@
                 $('cloud-model-id').value = state.cloud.targetModel || "";
                 $('cloud-endpoint').value = state.cloud.endpoint || ""; // LOAD ENDPOINT
                 $('auto-detect-toggle').checked = state.cloud.autoDetect;
-                $('ctx-slider').value = state.settings.contextStrategy;
-                $('temp-slider').value = state.settings.temperature;
-                $('temp-val').textContent = state.settings.temperature;
                 
-                updateContextUI(state.settings.contextStrategy);
                 renderSessions();
 
                 if (!state.currentSessionId || !state.sessions[state.currentSessionId]) createSession();
-                else { renderChat(); renderLore(); }
+                else { 
+                    loadSessionSettings();
+                    // Load Recap into UI
+                    if(state.sessions[state.currentSessionId].recap !== undefined) {
+                        $('story-recap-input').value = state.sessions[state.currentSessionId].recap;
+                    }
+                    renderChat(); 
+                    renderLore(); 
+                }
                 
                 updateHeader();
                 
@@ -390,6 +391,10 @@
                     ui.toast("Restoring active model...", "info");
                     await initEngine(activeId);
                 }
+                
+                // Auto scroll on start
+                setTimeout(scrollToBottom, 500);
+
             } catch (e) { console.error(e); ui.toast("Load Error", "error"); }
         }
 
@@ -412,10 +417,7 @@
             const models = CLOUD_PROVIDERS[provider].models;
             renderModelSuggestions(models);
             
-            // Show toast
             ui.toast(`Detected: ${keyType}`, "success");
-            
-            // Open suggestions automatically
             showModelSuggestions(true);
         };
 
@@ -439,6 +441,47 @@
             else el.classList.add('hidden');
         };
 
+        // --- LITE: RECAP LOGIC ---
+        window.saveRecap = () => {
+            if(state.currentSessionId) {
+                state.sessions[state.currentSessionId].recap = $('story-recap-input').value;
+                saveState();
+                ui.toast("Successfully saved!", "success");
+            }
+        };
+
+        async function generateRecap() {
+            ui.toast("Saving Recap...", "info");
+            const session = state.sessions[state.currentSessionId];
+            const messagesToSummarize = session.history.slice(-20);
+            let textToSummarize = messagesToSummarize.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n');
+            
+            const prompt = `Write a 1 or 2 paragraph recap of the following story events. Include important details, character actions, and context so the AI won't forget them.\n\nPrevious Recap Context: ${session.recap || "None."}\n\nNew Events to Summarize:\n${textToSummarize}`;
+            
+            try {
+                const activeId = state.settings.activeModelId;
+                let recapContent = "";
+                const msgs = [{ role: "user", content: prompt }];
+                
+                if (activeId === 'cloud') {
+                    recapContent = await callCloudWithFallback(msgs);
+                } else if (engine && modelLoaded) {
+                    const res = await engine.chat.completions.create({ messages: msgs, temperature: 0.3 });
+                    recapContent = res.choices[0].message.content;
+                } else {
+                    throw new Error("No active model for recap.");
+                }
+                
+                session.recap = recapContent;
+                if($('story-recap-input')) $('story-recap-input').value = session.recap;
+                saveState();
+                ui.toast("Recap generated!", "success");
+            } catch (err) {
+                console.error("Auto-Recap failed:", err);
+                ui.toast("Failed to generate recap", "error");
+            }
+        }
+
         // --- LORE LOGIC ---
         function renderLore() {
             const l = $('lore-list'); l.innerHTML = '';
@@ -446,11 +489,15 @@
                 const d = document.createElement('div');
                 d.className = "bg-gray-800/50 p-2.5 rounded-lg flex justify-between border border-gray-700 mb-2";
                 d.innerHTML = `
-                    <div class="overflow-hidden flex-1 cursor-pointer" onclick="editLore(${i})">
-                        <div class="text-xs font-bold text-purple-400 flex items-center gap-2">${c.name} <i class="ri-pencil-line text-gray-600 text-[10px]"></i></div>
+                    <div class="overflow-hidden flex-1 cursor-pointer">
+                        <div class="text-xs font-bold text-purple-400 flex items-center gap-2">${c.name}</div>
                         <div class="text-[10px] text-gray-400 line-clamp-2">${c.description}</div>
                     </div>
-                    <button class="text-gray-500 hover:text-red-400 px-1 ml-2" onclick="delLore(${i})"><i class="ri-close-circle-line"></i></button>`;
+                    <div class="flex items-center gap-1 ml-2">
+                        <button class="text-gray-500 hover:text-green-400 px-1" onclick="copyLore(${i})" title="Copy"><i class="ri-file-copy-line"></i></button>
+                        <button class="text-gray-500 hover:text-blue-400 px-1" onclick="editLore(${i})" title="Edit"><i class="ri-pencil-line"></i></button>
+                        <button class="text-gray-500 hover:text-red-400 px-1" onclick="delLore(${i})" title="Delete"><i class="ri-close-circle-line"></i></button>
+                    </div>`;
                 l.appendChild(d);
             });
             if(editingLoreIndex === -1) resetLoreForm();
@@ -464,6 +511,12 @@
             $('cancel-lore-btn').classList.remove('hidden');
             $('lore-header-text').textContent = "Editing Card";
             editingLoreIndex = i;
+        };
+        
+        window.copyLore = (i) => {
+            const item = state.sessions[state.currentSessionId].lore[i];
+            navigator.clipboard.writeText(`Name: ${item.name}\nDescription: ${item.description}`);
+            ui.toast("Lore Copied");
         };
 
         function resetLoreForm() {
@@ -491,7 +544,11 @@
             const labels = ["MINIMAL", "SAFE", "ULTIMATE"];
             $('ctx-label').textContent = labels[val];
             $('ctx-label').className = `font-mono font-bold text-xs ${val==2?'text-red-500':(val==1?'text-blue-400':'text-gray-400')}`;
-            state.settings.contextStrategy = parseInt(val); saveState(); renderModels();
+            state.settings.contextStrategy = parseInt(val);
+            if(state.currentSessionId && state.sessions[state.currentSessionId]) {
+                state.sessions[state.currentSessionId].settings = { ...state.settings };
+            }
+            saveState(); renderModels();
         }
 
         function renderModels() {
@@ -532,7 +589,6 @@
         }
 
         async function initEngine(modelId) {
-            // CHECK: If model is already loaded, skip reload
             if (modelId === loadedModelId && engine && modelLoaded) {
                  ui.toast("Model already ready", "success");
                  return;
@@ -546,7 +602,7 @@
                 engine.setInitProgressCallback((r) => { $('loader-bar').style.width = (r.progress * 100) + '%'; $('loader-text').textContent = r.text; });
                 await engine.reload(modelId, { context_window_size: limit, temperature: parseFloat(state.settings.temperature) });
                 modelLoaded = true; 
-                loadedModelId = modelId; // MARK: Set global loaded ID
+                loadedModelId = modelId; 
                 ui.toast(`Ready (${limit} ctx)`, "success");
             } catch (e) { 
                 handleUnresponsive(e);
@@ -569,21 +625,53 @@
         window.quickAction = (text) => { $('user-input').value = text; $('user-input').focus(); };
 
         async function generateResponse() {
-            const inputEl = $('user-input'), txt = inputEl.value.trim();
+            const inputEl = $('user-input');
+            const txt = inputEl.value.trim();
             if (!txt) return;
-            const session = state.sessions[state.currentSessionId], activeId = state.settings.activeModelId;
-            if(!activeId) { ui.toast("Select a model in settings", "error"); togglePanel(true); switchTab('models'); return; }
-            if(activeId !== 'cloud' && (!engine || !modelLoaded)) { ui.toast("Model not loaded", "error"); return; }
 
-            inputEl.value = ''; const btn = $('send-btn'); btn.disabled = true; btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i>';
+            const session = state.sessions[state.currentSessionId];
+            const activeId = state.settings.activeModelId;
+
+            if(!activeId) { 
+                ui.toast("Select a model in settings", "error"); 
+                togglePanel(true); 
+                switchTab('models'); 
+                return; 
+            }
+            if(activeId !== 'cloud' && (!engine || !modelLoaded)) { 
+                ui.toast("Model not loaded", "error"); 
+                togglePanel(true);
+                return; 
+            }
+
+            const btn = $('send-btn'); 
+            btn.disabled = true; 
+            btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i>';
+
+            inputEl.value = '';
+            localStorage.setItem('cwai_draft', ''); 
+
             session.history.push({ role: 'user', content: txt });
-            appendMessage({ role: 'user', content: txt });
-            const aiBubbleId = appendMessage({ role: 'assistant', content: '' }, true);
+            renderChat(); 
+            
+            const aiBubbleId = 'msg-' + Date.now();
+            const c = $('chat-container');
+            const div = document.createElement('div');
+            div.className = `flex w-full justify-start animate-enter-message mb-6`;
+            div.innerHTML = `<div id="${aiBubbleId}" class="max-w-[90%] md:max-w-[85%] px-5 py-3.5 text-sm shadow-md leading-relaxed msg-ai"><div class="flex gap-1 py-1"><span class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></span><span class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce delay-100"></span><span class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce delay-200"></span></div></div>`;
+            c.appendChild(div);
+            scrollToBottom();
 
             try {
                 let loreTxt = session.lore.map(l => `${l.name}: ${l.description}`).join('\n');
-                let sys = (session.system || $('system-prompt-input').value || "You are a helpful AI.") + (loreTxt ? `\n\nCONTEXT:\n${loreTxt}` : "");
-                let msgs = [{ role: "system", content: sys }, ...session.history.slice(0, -1)];
+                
+                // Lite: Inject Recap
+                let recapTxt = session.recap ? `\nSTORY RECAP (Prior Events):\n${session.recap}\n` : "";
+                let sys = (session.system || $('system-prompt-input').value || "You are a helpful AI.") + recapTxt + (loreTxt ? `\n\nCONTEXT:\n${loreTxt}` : "");
+                
+                // Lite: Limit context window to last 20 messages to keep API costs low
+                let contextWindow = session.history.slice(-20);
+                let msgs = [{ role: "system", content: sys }, ...contextWindow];
 
                 let fullContent = "";
                 if(activeId === 'cloud') {
@@ -601,11 +689,27 @@
                 session.history.push({ role: 'assistant', content: fullContent });
                 if (session.history.length === 2 && session.name === "New Chat") { session.name = txt.substring(0, 30); renderSessions(); }
                 await saveState();
+                
+                renderChat(); 
+
+                // Lite: Trigger auto-recap every 20 messages
+                if (session.history.length > 0 && session.history.length % 20 === 0) {
+                    generateRecap();
+                }
+
             } catch (e) {
-                document.getElementById(aiBubbleId)?.parentElement.remove();
-                handleUnresponsive(e);
+                session.history.pop(); 
+                renderChat(); 
+                
                 inputEl.value = txt; 
-            } finally { btn.disabled = false; btn.innerHTML = '<i class="ri-arrow-up-line text-xl"></i>'; }
+                localStorage.setItem('cwai_draft', txt);
+                
+                handleUnresponsive(e);
+            } finally { 
+                btn.disabled = false; 
+                btn.innerHTML = '<i class="ri-arrow-up-line text-xl"></i>'; 
+                scrollToBottom();
+            }
         }
 
         async function callCloudWithFallback(messages) {
@@ -614,7 +718,6 @@
                  const prov = detectProvider(key);
                  let url, body, headers;
                  
-                 // USE CUSTOM ENDPOINT IF AVAILABLE, ELSE AUTO-DETECT
                  let baseEndpoint = state.cloud.endpoint;
                  if(!baseEndpoint) baseEndpoint = prov === 'google' ? "https://generativelanguage.googleapis.com/v1beta/models" : (prov === 'openrouter' ? "https://openrouter.ai/api/v1/chat/completions" : "https://api.deepseek.com/chat/completions");
 
@@ -625,15 +728,14 @@
                      
                      let mName = state.cloud.targetModel.includes('/') ? state.cloud.targetModel.split('/')[1] : (state.cloud.targetModel || "gemini-2.0-flash-lite-preview-02-05");
                      
-                     // Construct Google URL safely
                      if (baseEndpoint.includes(':generateContent')) url = `${baseEndpoint}?key=${key}`;
                      else url = `${baseEndpoint}/${mName}:generateContent?key=${key}`;
 
                      body = JSON.stringify({ contents }); headers = {'Content-Type': 'application/json'};
                  } else {
-                     url = baseEndpoint; // Direct use for OpenAI compatible
+                     url = baseEndpoint; 
                      headers = { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' };
-                     if(prov === 'openrouter') { headers['HTTP-Referer'] = window.location.href; headers['X-Title'] = 'CWAI 1.2.5'; }
+                     if(prov === 'openrouter') { headers['HTTP-Referer'] = window.location.href; headers['X-Title'] = 'CWAI 1.4'; }
                      body = JSON.stringify({ model: state.cloud.targetModel || 'gpt-3.5-turbo', messages, temperature: parseFloat(state.settings.temperature) });
                  }
                  const res = await fetch(url, { method: 'POST', headers, body });
@@ -647,13 +749,14 @@
 
         function handleUnresponsive(e) {
             ui.toast("Model Error: " + e.message, "error");
-            togglePanel(true); switchTab('models');
-            state.settings.activeModelId = null; updateHeader();
+            togglePanel(true); 
+            if(!state.settings.activeModelId) switchTab('models');
+            updateHeader();
         }
 
         function detectProvider(key) { if(!state.cloud.autoDetect) return 'openrouter'; if(key.startsWith('AIza')) return 'google'; if(key.startsWith('sk-or-')) return 'openrouter'; if(key.startsWith('sk-')) return 'deepseek'; return 'openrouter'; }
 
-        // --- SESSIONS (Updated 1.2.5 Logic) ---
+        // --- SESSIONS ---
         function renderSessions() {
             const list = $('session-list'); list.innerHTML = '';
             const term = $('session-search').value.toLowerCase();
@@ -665,7 +768,7 @@
                     <div class="overflow-hidden mr-2 flex-1"><div class="text-xs font-medium text-gray-200 truncate group-hover:text-white">${s.name}</div><div class="text-[10px] text-gray-500">${new Date(s.created).toLocaleDateString()}</div></div>
                     <div class="flex gap-1 pl-2">
                          <button class="rename-btn p-1.5 text-gray-500 hover:text-blue-300" title="Rename"><i class="ri-pencil-line"></i></button>
-                         <button class="copy-btn p-1.5 text-gray-500 hover:text-green-300" title="Copy"><i class="ri-file-copy-line"></i></button>
+                         <button class="copy-btn p-1.5 text-gray-500 hover:text-green-300" title="Duplicate"><i class="ri-file-copy-line"></i></button>
                          <button class="del-btn p-1.5 text-gray-500 hover:text-red-400" title="Delete"><i class="ri-delete-bin-line"></i></button>
                     </div>`;
                 d.onclick = (e) => {
@@ -676,8 +779,14 @@
                             if(confirm('Delete chat permanently?')) { delete state.sessions[s.id]; if(s.id===state.currentSessionId) createSession(); else { saveState(); renderSessions(); } } 
                         }
                         else if(btn.classList.contains('copy-btn')) {
-                            const newId = Date.now().toString(); state.sessions[newId] = {...s, id: newId, created: Date.now(), name: "Copy of " + s.name};
-                            saveState(); renderSessions(); ui.toast("Chat Copied");
+                            // Lite: Deep Clone logic for branching narratives
+                            const newId = Date.now().toString(); 
+                            const copy = JSON.parse(JSON.stringify(s));
+                            copy.id = newId;
+                            copy.created = Date.now();
+                            copy.name = s.name + " (Copy)";
+                            state.sessions[newId] = copy;
+                            saveState(); renderSessions(); ui.toast("Chat Duplicated");
                         }
                         else if(btn.classList.contains('rename-btn')) {
                             const newName = prompt("Rename Chat:", s.name);
@@ -685,21 +794,89 @@
                         }
                         return;
                     }
-                    state.currentSessionId = s.id; if(s.system) $('system-prompt-input').value = s.system; 
+                    state.currentSessionId = s.id; 
+                    loadSessionSettings(); 
+                    if(s.system) $('system-prompt-input').value = s.system; 
+                    if(s.recap !== undefined) $('story-recap-input').value = s.recap; else $('story-recap-input').value = "";
                     renderChat(); renderLore(); renderSessions(); if(window.innerWidth<768) togglePanel(false);
                 };
                 list.appendChild(d);
             });
         }
-
-        // --- DOM RENDERERS ---
-        function appendMessage(msg, isThinking=false) {
-            const c = $('chat-container'); const isUser = msg.role === 'user';
-            const div = document.createElement('div'); const id = 'msg-' + Date.now() + Math.random();
-            div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'} animate-enter-message mb-6`;
-            div.innerHTML = `<div id="${id}" class="max-w-[90%] md:max-w-[85%] px-5 py-3.5 text-sm shadow-md leading-relaxed ${isUser ? 'msg-user' : 'msg-ai'}">${isThinking ? '<div class="flex gap-1 py-1"><span class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></span><span class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce delay-100"></span><span class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce delay-200"></span></div>' : (isUser ? msg.content : marked.parse(msg.content))}</div>`;
-            c.appendChild(div); scrollToBottom(); return id;
+        
+        function loadSessionSettings() {
+            const s = state.sessions[state.currentSessionId];
+            if(s.settings) {
+                state.settings = { ...state.settings, ...s.settings };
+            }
+            $('ctx-slider').value = state.settings.contextStrategy;
+            $('temp-slider').value = state.settings.temperature;
+            $('temp-val').textContent = state.settings.temperature;
+            updateContextUI(state.settings.contextStrategy); 
+            updateHeader();
         }
+
+        // --- CHAT RENDERING ---
+        function renderChat() {
+            const c = $('chat-container');
+            c.innerHTML = '';
+            
+            const session = state.sessions[state.currentSessionId];
+            
+            if (!session || session.history.length === 0) {
+                 c.innerHTML = `
+                    <div id="welcome-message" class="flex flex-col items-center justify-center h-[60vh] text-gray-600 fade-in">
+                        <div class="w-20 h-20 rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center mb-6 shadow-2xl rotate-3 hover:rotate-0 transition duration-500 group">
+                             <i class="ri-cpu-line text-5xl text-gray-700 group-hover:text-blue-500 transition-colors"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-300 mb-2">Neural Interface Ready</h2>
+                        <p class="text-sm font-mono text-gray-500 text-center max-w-xs" id="ram-welcome-msg">Detecting Hardware...</p>
+                    </div>`;
+                 if($('ram-welcome-msg')) $('ram-welcome-msg').textContent = `System: ${deviceRam}GB RAM detected.`;
+                 return;
+            }
+
+            session.history.forEach((msg, idx) => {
+                const isUser = msg.role === 'user';
+                const div = document.createElement('div');
+                const id = 'msg-hist-' + idx;
+                div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'} mb-6 group relative`;
+                
+                const editBtn = `
+                    <button onclick="editMessage(${idx})" class="absolute ${isUser ? 'left-0 -translate-x-full pr-2' : 'right-0 translate-x-full pl-2'} top-2 opacity-0 group-hover:opacity-100 transition text-gray-600 hover:text-white">
+                        <i class="ri-pencil-line"></i>
+                    </button>
+                `;
+
+                div.innerHTML = `
+                    ${editBtn}
+                    <div id="${id}" class="max-w-[90%] md:max-w-[85%] px-5 py-3.5 text-sm shadow-md leading-relaxed ${isUser ? 'msg-user' : 'msg-ai'}">
+                        ${isUser ? msg.content : `<div class="prose prose-invert">${marked.parse(msg.content)}</div>`}
+                    </div>`;
+                
+                c.appendChild(div);
+                if (!isUser) {
+                     const el = document.getElementById(id);
+                     if(el) {
+                         el.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
+                         addCopyButtons(el);
+                     }
+                }
+            });
+            scrollToBottom();
+        }
+
+        window.editMessage = (idx) => {
+             const session = state.sessions[state.currentSessionId];
+             const msg = session.history[idx];
+             const newContent = prompt("Edit message:", msg.content);
+             if(newContent !== null) {
+                 session.history[idx].content = newContent;
+                 saveState();
+                 renderChat();
+             }
+        };
+
         function updateAiMessage(id, content, streaming=false) {
             const el = document.getElementById(id); if(!el) return;
             el.innerHTML = `<div class="prose prose-invert">${marked.parse(content + (streaming ? ' ▍' : ''))}</div>`;
@@ -707,13 +884,45 @@
             scrollToBottom();
         }
         function addCopyButtons(el) { el.querySelectorAll('pre').forEach(pre => { if(pre.querySelector('.copy-code-btn')) return; const btn = document.createElement('button'); btn.className='copy-code-btn'; btn.textContent='Copy'; btn.onclick = () => { navigator.clipboard.writeText(pre.querySelector('code').innerText); btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',2000); }; pre.appendChild(btn); }); }
-        function scrollToBottom() { const c = $('chat-container'); if(c.scrollHeight - c.scrollTop - c.clientHeight < 200) c.scrollTop = c.scrollHeight; }
+        
+        function scrollToBottom() { 
+            const c = $('chat-container'); 
+            c.scrollTop = c.scrollHeight;
+        }
 
         // --- EXPORTS & EVENTS ---
-        function createSession() { const id = Date.now().toString(); state.sessions[id] = { id, name: "New Chat", history: [], created: Date.now(), system: "", lore: [] }; state.currentSessionId = id; saveState(); renderSessions(); renderChat(); renderLore(); }
+        function createSession() { 
+            const id = Date.now().toString(); 
+            state.sessions[id] = { 
+                id, 
+                name: "New Chat", 
+                history: [], 
+                created: Date.now(), 
+                system: "", 
+                recap: "", // Lite integration
+                lore: [],
+                settings: { ...state.settings } 
+            }; 
+            state.currentSessionId = id; 
+            saveState(); 
+            renderSessions(); 
+            renderChat(); 
+            renderLore(); 
+            if($('story-recap-input')) $('story-recap-input').value = "";
+        }
         async function saveState() { await set(DB_KEY, state); }
 
-        window.setActive = async (id) => { state.settings.activeModelId = id; await saveState(); renderModels(); updateHeader(); if(id!=='cloud') await initEngine(id); else ui.toast("Cloud Active"); };
+        window.setActive = async (id) => { 
+            state.settings.activeModelId = id; 
+            if(state.currentSessionId) {
+                if(!state.sessions[state.currentSessionId].settings) state.sessions[state.currentSessionId].settings = {};
+                state.sessions[state.currentSessionId].settings.activeModelId = id;
+            }
+            await saveState(); 
+            renderModels(); 
+            updateHeader(); 
+            if(id!=='cloud') await initEngine(id); else ui.toast("Cloud Active"); 
+        };
         window.deleteLocal = async (id) => { if(confirm("Delete cache?")) { state.downloadedModels = state.downloadedModels.filter(x=>x!==id); if(state.settings.activeModelId===id) state.settings.activeModelId=null; await saveState(); renderModels(); updateHeader(); }};
         window.downloadModel = downloadModel;
         
@@ -724,43 +933,38 @@
             else { const m = OFFLINE_MODELS.find(x=>x.id===mId); n.textContent = m?m.name:"Local"; d.className = "w-1.5 h-1.5 rounded-full bg-green-500"; }
         }
 
-        // --- UPDATED TAB SWITCHING WITH ANIMATION ---
         function switchTab(tabName) {
-            document.querySelectorAll('.tab-btn').forEach(b => { 
-                b.classList.remove('text-blue-400', 'active-tab'); 
-                b.classList.add('text-gray-500'); 
-                if(b.dataset.tab===tabName) { b.classList.add('text-blue-400', 'active-tab'); b.classList.remove('text-gray-500'); } 
-            });
-            
-            // Hide all tabs
-            ['models','lore','data','system'].forEach(t => {
-                const el = $(`tab-${t}`);
-                el.classList.add('hidden');
-                el.classList.remove('animate-slide-in'); // Reset animation
-            });
-            
-            // Show new tab with animation
-            const target = $(`tab-${tabName}`);
-            target.classList.remove('hidden');
-            // Trigger reflow to restart animation
-            void target.offsetWidth; 
-            target.classList.add('animate-slide-in');
+            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('text-blue-400', 'active-tab'); b.classList.add('text-gray-500'); if(b.dataset.tab===tabName) { b.classList.add('text-blue-400', 'active-tab'); b.classList.remove('text-gray-500'); } });
+            ['models','lore','data','system'].forEach(t => $(`tab-${t}`).classList.add('hidden')); $(`tab-${tabName}`).classList.remove('hidden');
         }
 
         $('send-btn').onclick = generateResponse;
         $('user-input').onkeydown = (e) => { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault(); generateResponse();} };
+        $('user-input').oninput = (e) => {
+            localStorage.setItem('cwai_draft', e.target.value);
+            e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';
+        };
+
         $('header-menu-btn').onclick = () => { renderModels(); renderSessions(); togglePanel(true); };
+        
+        $('header-focus-btn').onclick = () => ui.toggleFocus(true);
+        $('focus-exit-btn').onclick = () => ui.toggleFocus(false);
         
         document.querySelectorAll('.tab-btn').forEach(btn => btn.onclick = () => switchTab(btn.dataset.tab));
 
         $('ctx-slider').oninput = (e) => updateContextUI(e.target.value);
-        $('temp-slider').oninput = (e) => { $('temp-val').textContent = e.target.value; state.settings.temperature = e.target.value; };
+        $('temp-slider').oninput = (e) => { 
+            $('temp-val').textContent = e.target.value; 
+            state.settings.temperature = e.target.value; 
+            if(state.currentSessionId) state.sessions[state.currentSessionId].settings.temperature = e.target.value;
+            saveState();
+        };
         
         $('activate-cloud-btn').onclick = () => { 
             state.cloud.primary=$('cloud-key-primary').value.trim(); 
             state.cloud.backup=$('cloud-key-backup').value.trim(); 
             state.cloud.targetModel=$('cloud-model-id').value.trim(); 
-            state.cloud.endpoint=$('cloud-endpoint').value.trim(); // SAVE ENDPOINT
+            state.cloud.endpoint=$('cloud-endpoint').value.trim(); 
             state.cloud.autoDetect=$('auto-detect-toggle').checked; 
             window.setActive('cloud'); 
         };
@@ -774,24 +978,6 @@
             const r = new SR(); r.continuous=false; r.onstart=()=>$('mic-btn').classList.add('text-red-500','animate-pulse'); r.onend=()=>$('mic-btn').classList.remove('text-red-500','animate-pulse');
             r.onresult=(e)=>$('user-input').value+=(($('user-input').value?' ':'')+e.results[0][0].transcript); r.start();
         };
-
-        // --- NEW: SERVICE WORKER UPDATE HANDLER ---
-        let newWorker;
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').then(reg => {
-                reg.addEventListener('updatefound', () => {
-                    newWorker = reg.installing;
-                    newWorker.addEventListener('statechange', () => {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            // Show Update Toast
-                            const t = $('update-toast');
-                            t.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
-                        }
-                    });
-                });
-            });
-        }
-        $('update-btn').onclick = () => { if(newWorker) newWorker.postMessage('SKIP_WAITING'); window.location.reload(); };
 
         window.onload = loadState;
     </script>
