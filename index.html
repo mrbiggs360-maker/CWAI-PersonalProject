@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CWAI 1.4 | Neural Interface</title>
+    <title>CWAI 1.5 | Neural Interface</title>
     
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#050505">
-    <link rel="apple-touch-icon" href="https://dummyimage.com/192x192/2563eb/ffffff.png&text=CWAI+1.4">
+    <link rel="apple-touch-icon" href="https://dummyimage.com/192x192/2563eb/ffffff.png&text=CWAI+1.5">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -87,7 +87,7 @@
                 </svg>
             </div>
             <div>
-                <h1 class="text-sm font-bold text-gray-100 tracking-tight leading-none">CWAI 1.4</h1>
+                <h1 class="text-sm font-bold text-gray-100 tracking-tight leading-none">CWAI 1.5</h1>
                 <div id="header-model-status" class="text-[10px] text-gray-400 flex items-center gap-1 cursor-pointer hover:text-blue-400 transition mt-0.5">
                     <span class="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]" id="status-dot"></span>
                     <span id="current-model-name">No Model Loaded</span>
@@ -200,7 +200,7 @@
                 
                  <div class="bg-gray-900/40 rounded-xl p-4 border border-gray-800">
                     <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-3" id="lore-header-text">Create Persona Card</h3>
-                    <input id="lore-name-input" type="text" placeholder="Character Name" class="w-full bg-black/50 border border-gray-800 rounded-lg p-2.5 text-xs text-white mb-2 focus:border-purple-500 outline-none">
+                    <input id="lore-name-input" type="text" placeholder="Character Name or Aliases (comma separated)" class="w-full bg-black/50 border border-gray-800 rounded-lg p-2.5 text-xs text-white mb-2 focus:border-purple-500 outline-none">
                     <textarea id="lore-desc-input" placeholder="Details (Personality, Appearance, Secret)" class="w-full bg-black/50 border border-gray-800 rounded-lg p-2.5 text-xs text-white h-24 resize-none focus:border-purple-500 outline-none mb-3"></textarea>
                     <div class="flex gap-2">
                         <button id="cancel-lore-btn" class="hidden w-1/3 py-2 bg-gray-800 border border-gray-700 text-gray-400 text-xs font-bold rounded-lg hover:bg-gray-700 transition">Cancel</button>
@@ -222,7 +222,7 @@
                     <button id="load-presets-btn" class="bg-indigo-900/20 hover:bg-indigo-900/40 text-indigo-300 py-3 rounded-xl text-xs font-medium border border-indigo-500/20 flex flex-col items-center gap-1 transition"><i class="ri-book-read-line text-lg"></i> Examples</button>
                     <button id="export-btn" class="bg-gray-800 hover:bg-gray-700 text-white py-3 rounded-xl text-xs font-medium border border-gray-700 flex flex-col items-center gap-1 transition"><i class="ri-upload-2-line text-lg"></i> Backup</button>
                 </div>
-                <button id="import-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-white py-3 rounded-xl text-xs font-medium border border-gray-700 flex items-center justify-center gap-2 transition"><i class="ri-download-2-line text-lg"></i> Restore Backup</button>
+                <button id="import-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-white py-3 rounded-xl text-xs font-medium border border-gray-700 flex items-center justify-center gap-2 transition mb-2"><i class="ri-download-2-line text-lg"></i> Restore Backup</button>
             </div>
             
             <div id="tab-system" class="hidden space-y-6 fade-in">
@@ -247,7 +247,12 @@
                     <input type="range" id="temp-slider" min="0" max="1" step="0.1" value="0.7" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-600">
                     <div class="flex justify-between text-[9px] text-gray-500 font-mono"><span>PRECISE</span><span>BALANCED</span><span>CREATIVE</span></div>
                 </div>
-                <button id="wipe-data-btn" class="w-full py-3 text-xs text-red-400 border border-red-900/30 bg-red-900/10 rounded-xl hover:bg-red-900/20 transition font-bold uppercase tracking-wider">Reset App Data</button>
+                
+                <div class="bg-red-900/10 rounded-xl p-4 border border-red-900/20">
+                    <h3 class="text-xs font-bold text-red-400 uppercase tracking-wider mb-2 flex items-center gap-2"><i class="ri-refresh-line"></i> System Reset</h3>
+                    <p class="text-[10px] text-gray-500 mb-3 leading-relaxed italic">Permanently wipe all PWA data, local models, cached API models, and sessions.</p>
+                    <button id="wipe-data-btn" class="w-full py-3 text-xs text-red-400 border border-red-900/30 bg-red-900/10 rounded-xl hover:bg-red-900/20 transition font-bold uppercase tracking-wider">Factory Reset</button>
+                </div>
             </div>
         </div>
     </div>
@@ -274,7 +279,6 @@
     <div id="toast-container" class="fixed top-20 right-4 z-[110] flex flex-col gap-2 pointer-events-none"></div>
 
     <script>
-        // Lite: PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
@@ -288,8 +292,9 @@
         import { get, set, del } from 'https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm';
 
         // --- CONSTANTS ---
-        const DB_KEY = 'cwai_1_4_db';
+        const DB_KEY = 'cwai_1_5_db'; // Bumped version DB
         const OFFLINE_MODELS = [
+            { id: "Qwen2.5-0.5B-Instruct-q4f16_1-MLC", name: "Qwen 2.5 0.5B", reqRam: 1, tags: ["Ultra-Light", "Alibaba"], limits: [1024, 4096, 32768] },
             { id: "TinyLlama-1.1B-Chat-v0.4-q4f32_1-MLC-1k", name: "TinyLlama 1.1B", reqRam: 2, tags: ["Fast", "Light"], limits: [1024, 2048, 2048] },
             { id: "gemma-2-2b-it-q4f32_1-MLC", name: "Gemma 2 2B", reqRam: 4, tags: ["Balanced", "Google"], limits: [2048, 4096, 8192] },
             { id: "Llama-3.2-3B-Instruct-q4f16_1-MLC", name: "Llama 3.2 3B", reqRam: 6, tags: ["Smart", "Meta"], limits: [2048, 4096, 128000] },
@@ -300,17 +305,15 @@
         const CLOUD_PROVIDERS = {
             google: {
                 url: "https://generativelanguage.googleapis.com/v1beta/models",
-                models: [
-                    "gemini-3.0-pro-preview-01", "gemini-2.5-flash-latest", "gemini-2.0-flash-lite-preview-02-05", 
-                    "gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"
-                ]
+                models: ["gemini-3.0-pro-preview-01", "gemini-2.5-flash-latest", "gemini-2.0-flash-lite-preview-02-05", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"]
             },
             openrouter: {
                 url: "https://openrouter.ai/api/v1/chat/completions",
-                models: [
-                    "google/gemini-2.0-flash-001", "anthropic/claude-3-opus", "meta-llama/llama-3-70b-instruct",
-                    "deepseek/deepseek-r1"
-                ]
+                models: ["google/gemini-2.0-flash-001", "anthropic/claude-3-opus", "meta-llama/llama-3-70b-instruct", "deepseek/deepseek-r1"]
+            },
+            openai: {
+                url: "https://api.openai.com/v1/chat/completions",
+                models: ["gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo"]
             },
             deepseek: {
                 url: "https://api.deepseek.com/chat/completions",
@@ -320,7 +323,11 @@
 
         let state = {
             sessions: {}, currentSessionId: null,
-            cloud: { primary: "", backup: "", targetModel: "", endpoint: "", autoDetect: true },
+            cloud: { 
+                primary: "", backup: "", targetModel: "", endpoint: "", autoDetect: true,
+                lastDiscovery: { openrouter: 0, google: 0, openai: 0 },
+                cachedModels: { openrouter: [], google: [], openai: [] }
+            },
             settings: { activeModelId: null, temperature: 0.7, tts: false, contextStrategy: 1 },
             downloadedModels: []
         };
@@ -331,9 +338,12 @@
         const ui = {
             toast(msg, type='info') {
                 const el = document.createElement('div');
-                const styles = { error: 'bg-red-500/10 border-red-500/50 text-red-200', success: 'bg-green-500/10 border-green-500/50 text-green-200', info: 'bg-gray-800/90 border-gray-700 text-gray-200' };
+                const styles = { error: 'bg-red-500/10 border-red-500/50 text-red-200', success: 'bg-green-500/10 border-green-500/50 text-green-200', info: 'bg-gray-800/90 border-gray-700 text-gray-200', warning: 'bg-yellow-500/10 border-yellow-500/50 text-yellow-200' };
+                let iconClass = type === 'error' ? 'error-warning' : (type === 'success' ? 'checkbox-circle' : (type === 'warning' ? 'alert' : 'information'));
+                if(msg === 'Saving Recap...') iconClass = 'loader-4 animate-spin';
+                
                 el.className = `p-3 rounded-lg border text-xs shadow-xl backdrop-blur fade-in pointer-events-auto flex items-center gap-2 transform transition-all duration-300 ${styles[type]||styles.info}`;
-                el.innerHTML = `<i class="ri-${type==='error'?'error-warning':(type==='success'?'checkbox-circle':'information')}-line text-base"></i> <span class="font-medium">${msg}</span>`;
+                el.innerHTML = `<i class="ri-${iconClass}-line text-base"></i> <span class="font-medium">${msg}</span>`;
                 $('toast-container').appendChild(el);
                 setTimeout(() => { el.style.opacity='0'; el.style.transform='translateX(20px)'; setTimeout(()=>el.remove(), 300); }, 3000);
             },
@@ -358,16 +368,19 @@
         async function loadState() {
             try {
                 $('ram-badge').textContent = `RAM: ~${deviceRam}GB`;
-                // Restore draft
                 $('user-input').value = localStorage.getItem('cwai_draft') || '';
 
                 const data = await get(DB_KEY);
                 if (data) state = { ...state, ...data, sessions: data.sessions || {}, cloud: { ...state.cloud, ...data.cloud } };
 
+                // Ensure Discovery tracking exists from old DB
+                if (!state.cloud.lastDiscovery) state.cloud.lastDiscovery = { openrouter: 0, google: 0, openai: 0 };
+                if (!state.cloud.cachedModels) state.cloud.cachedModels = { openrouter: [], google: [], openai: [] };
+
                 $('cloud-key-primary').value = state.cloud.primary || "";
                 $('cloud-key-backup').value = state.cloud.backup || "";
                 $('cloud-model-id').value = state.cloud.targetModel || "";
-                $('cloud-endpoint').value = state.cloud.endpoint || ""; // LOAD ENDPOINT
+                $('cloud-endpoint').value = state.cloud.endpoint || "";
                 $('auto-detect-toggle').checked = state.cloud.autoDetect;
                 
                 renderSessions();
@@ -375,7 +388,6 @@
                 if (!state.currentSessionId || !state.sessions[state.currentSessionId]) createSession();
                 else { 
                     loadSessionSettings();
-                    // Load Recap into UI
                     if(state.sessions[state.currentSessionId].recap !== undefined) {
                         $('story-recap-input').value = state.sessions[state.currentSessionId].recap;
                     }
@@ -385,37 +397,69 @@
                 
                 updateHeader();
                 
-                // AUTO LOAD LOGIC
                 const activeId = state.settings.activeModelId;
                 if(activeId && activeId !== 'cloud' && state.downloadedModels.includes(activeId)) {
                     ui.toast("Restoring active model...", "info");
                     await initEngine(activeId);
                 }
                 
-                // Auto scroll on start
                 setTimeout(scrollToBottom, 500);
 
             } catch (e) { console.error(e); ui.toast("Load Error", "error"); }
         }
 
-        // --- CLOUD AUTO DETECT LOGIC ---
-        window.detectAndFill = (key) => {
+        // --- DYNAMIC AUTO DISCOVERY LOGIC ---
+        window.detectAndFill = async (key) => {
             if(!key || !$('auto-detect-toggle').checked) return;
             
-            let provider = 'openrouter'; 
+            let provider = 'openai'; 
             let keyType = "Unknown";
 
             if(key.startsWith('AIza')) { provider = 'google'; keyType = "Google Gemini"; }
             else if(key.startsWith('sk-or-')) { provider = 'openrouter'; keyType = "OpenRouter"; }
+            else if(key.startsWith('sk-proj-') || (key.startsWith('sk-') && key.length > 40)) { provider = 'openai'; keyType = "OpenAI"; }
             else if(key.startsWith('sk-')) { provider = 'deepseek'; keyType = "DeepSeek/Generic"; }
 
-            // Auto-fill URL
-            const endpoint = CLOUD_PROVIDERS[provider].url;
-            $('cloud-endpoint').value = endpoint;
+            $('cloud-endpoint').value = CLOUD_PROVIDERS[provider].url;
             
-            // Populate Suggestions
-            const models = CLOUD_PROVIDERS[provider].models;
-            renderModelSuggestions(models);
+            const now = Date.now();
+            const oneHour = 60 * 60 * 1000;
+            
+            if (['openrouter', 'google', 'openai'].includes(provider)) {
+                if (now - (state.cloud.lastDiscovery[provider] || 0) > oneHour) {
+                    ui.toast(`Syncing ${keyType} models...`, "info");
+                    try {
+                        let modelIds = [];
+                        if (provider === 'openrouter') {
+                            const res = await fetch("https://openrouter.ai/api/v1/models", { headers: { "Authorization": `Bearer ${key}` }});
+                            const json = await res.json();
+                            modelIds = json.data.map(m => m.id);
+                        } else if (provider === 'google') {
+                            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+                            const json = await res.json();
+                            modelIds = json.models.map(m => m.name.replace('models/', ''));
+                        } else if (provider === 'openai') {
+                            const res = await fetch("https://api.openai.com/v1/models", { headers: { "Authorization": `Bearer ${key}` } });
+                            const json = await res.json();
+                            modelIds = json.data.map(m => m.id);
+                        }
+                        
+                        state.cloud.cachedModels[provider] = modelIds;
+                        state.cloud.lastDiscovery[provider] = now;
+                        saveState();
+                        
+                        renderModelSuggestions(modelIds);
+                        ui.toast(`Synced ${modelIds.length} models`, "success");
+                    } catch (e) {
+                        console.error("Auto-sync failed:", e);
+                        renderModelSuggestions(state.cloud.cachedModels[provider]?.length ? state.cloud.cachedModels[provider] : CLOUD_PROVIDERS[provider].models);
+                    }
+                } else {
+                    renderModelSuggestions(state.cloud.cachedModels[provider]?.length ? state.cloud.cachedModels[provider] : CLOUD_PROVIDERS[provider].models);
+                }
+            } else {
+                renderModelSuggestions(CLOUD_PROVIDERS[provider].models);
+            }
             
             ui.toast(`Detected: ${keyType}`, "success");
             showModelSuggestions(true);
@@ -441,7 +485,7 @@
             else el.classList.add('hidden');
         };
 
-        // --- LITE: RECAP LOGIC ---
+        // --- RECAP LOGIC ---
         window.saveRecap = () => {
             if(state.currentSessionId) {
                 state.sessions[state.currentSessionId].recap = $('story-recap-input').value;
@@ -621,11 +665,12 @@
             } catch (e) { ui.toast("Error: " + e.message, "error"); } finally { ui.showLoader(false); isDownloading = false; }
         }
 
-        // --- CHAT GENERATION & FALLBACK ---
+        // --- CHAT GENERATION & LITE FEATURES ---
         window.quickAction = (text) => { $('user-input').value = text; $('user-input').focus(); };
 
         async function generateResponse() {
             const inputEl = $('user-input');
+            const btn = $('send-btn');
             const txt = inputEl.value.trim();
             if (!txt) return;
 
@@ -634,19 +679,18 @@
 
             if(!activeId) { 
                 ui.toast("Select a model in settings", "error"); 
-                togglePanel(true); 
-                switchTab('models'); 
-                return; 
+                togglePanel(true); switchTab('models'); return; 
             }
             if(activeId !== 'cloud' && (!engine || !modelLoaded)) { 
                 ui.toast("Model not loaded", "error"); 
-                togglePanel(true);
-                return; 
+                togglePanel(true); return; 
             }
 
-            const btn = $('send-btn'); 
+            // Lock UI (Lite Port)
             btn.disabled = true; 
+            inputEl.disabled = true;
             btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i>';
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
 
             inputEl.value = '';
             localStorage.setItem('cwai_draft', ''); 
@@ -662,14 +706,33 @@
             c.appendChild(div);
             scrollToBottom();
 
+            // Unlock UI Helper
+            const resetUI = () => {
+                btn.disabled = false;
+                inputEl.disabled = false;
+                btn.innerHTML = '<i class="ri-arrow-up-line text-xl"></i>';
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                inputEl.focus();
+            };
+
             try {
-                let loreTxt = session.lore.map(l => `${l.name}: ${l.description}`).join('\n');
+                // Smart Lore Injection (Lite Port)
+                let loreTxt = "";
+                if (Array.isArray(session.lore)) {
+                    session.lore.forEach(l => {
+                        const aliases = l.name.split(',').map(n => n.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).filter(n => n);
+                        if (aliases.length > 0) {
+                            const regex = new RegExp(`\\b(${aliases.join('|')})\\b`, 'i');
+                            if (regex.test(txt)) {
+                                loreTxt += `${l.name}: ${l.description}\n`;
+                            }
+                        }
+                    });
+                }
                 
-                // Lite: Inject Recap
                 let recapTxt = session.recap ? `\nSTORY RECAP (Prior Events):\n${session.recap}\n` : "";
-                let sys = (session.system || $('system-prompt-input').value || "You are a helpful AI.") + recapTxt + (loreTxt ? `\n\nCONTEXT:\n${loreTxt}` : "");
+                let sys = (session.system || $('system-prompt-input').value || "You are a helpful AI.") + recapTxt + (loreTxt ? `\n\nCONTEXTUAL LORE TRIGGERED:\n${loreTxt}` : "");
                 
-                // Lite: Limit context window to last 20 messages to keep API costs low
                 let contextWindow = session.history.slice(-20);
                 let msgs = [{ role: "system", content: sys }, ...contextWindow];
 
@@ -689,10 +752,8 @@
                 session.history.push({ role: 'assistant', content: fullContent });
                 if (session.history.length === 2 && session.name === "New Chat") { session.name = txt.substring(0, 30); renderSessions(); }
                 await saveState();
-                
                 renderChat(); 
 
-                // Lite: Trigger auto-recap every 20 messages
                 if (session.history.length > 0 && session.history.length % 20 === 0) {
                     generateRecap();
                 }
@@ -706,8 +767,7 @@
                 
                 handleUnresponsive(e);
             } finally { 
-                btn.disabled = false; 
-                btn.innerHTML = '<i class="ri-arrow-up-line text-xl"></i>'; 
+                resetUI();
                 scrollToBottom();
             }
         }
@@ -719,7 +779,9 @@
                  let url, body, headers;
                  
                  let baseEndpoint = state.cloud.endpoint;
-                 if(!baseEndpoint) baseEndpoint = prov === 'google' ? "https://generativelanguage.googleapis.com/v1beta/models" : (prov === 'openrouter' ? "https://openrouter.ai/api/v1/chat/completions" : "https://api.deepseek.com/chat/completions");
+                 if(!baseEndpoint) {
+                    baseEndpoint = CLOUD_PROVIDERS[prov] ? CLOUD_PROVIDERS[prov].url : "https://openrouter.ai/api/v1/chat/completions";
+                 }
 
                  if(prov === 'google') {
                      const contents = messages.filter(m=>m.role!=='system').map(m=>({ role: m.role==='assistant'?'model':'user', parts: [{text: m.content}] }));
@@ -727,7 +789,6 @@
                      if(sys && contents.length) contents[0].parts[0].text = "System: "+sys+"\n\n"+contents[0].parts[0].text;
                      
                      let mName = state.cloud.targetModel.includes('/') ? state.cloud.targetModel.split('/')[1] : (state.cloud.targetModel || "gemini-2.0-flash-lite-preview-02-05");
-                     
                      if (baseEndpoint.includes(':generateContent')) url = `${baseEndpoint}?key=${key}`;
                      else url = `${baseEndpoint}/${mName}:generateContent?key=${key}`;
 
@@ -735,16 +796,39 @@
                  } else {
                      url = baseEndpoint; 
                      headers = { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' };
-                     if(prov === 'openrouter') { headers['HTTP-Referer'] = window.location.href; headers['X-Title'] = 'CWAI 1.4'; }
-                     body = JSON.stringify({ model: state.cloud.targetModel || 'gpt-3.5-turbo', messages, temperature: parseFloat(state.settings.temperature) });
+                     if(prov === 'openrouter') { headers['HTTP-Referer'] = window.location.href; headers['X-Title'] = 'CWAI 1.5'; }
+                     const cleanMessages = messages.map(m => ({ role: m.role==='model'?'assistant':m.role, content: m.content }));
+                     body = JSON.stringify({ model: state.cloud.targetModel || 'gpt-3.5-turbo', messages: cleanMessages, temperature: parseFloat(state.settings.temperature) });
                  }
-                 const res = await fetch(url, { method: 'POST', headers, body });
-                 const d = await res.json();
-                 if(!res.ok || d.error) throw new Error(d.error?.message || "API Error");
-                 return prov === 'google' ? d.candidates[0].content.parts[0].text : d.choices[0].message.content;
+
+                 // AbortController for Timeout (Lite Port)
+                 const controller = new AbortController();
+                 const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+                 try {
+                     const res = await fetch(url, { method: 'POST', headers, body, signal: controller.signal });
+                     clearTimeout(timeoutId);
+                     const d = await res.json();
+                     if(!res.ok || d.error) throw new Error(d.error?.message || "API Error");
+                     return prov === 'google' ? d.candidates[0].content.parts[0].text : d.choices[0].message.content;
+                 } catch (e) {
+                     clearTimeout(timeoutId);
+                     if (e.name === 'AbortError') throw new Error('TIMEOUT');
+                     throw e;
+                 }
              };
-             try { return await tryCall(state.cloud.primary); } 
-             catch(e) { if(state.cloud.backup) { ui.toast("Primary failed, using Backup...", "info"); return await tryCall(state.cloud.backup, true); } throw e; }
+
+             try { 
+                 return await tryCall(state.cloud.primary); 
+             } catch(e) { 
+                 if(e.message === 'TIMEOUT' || e.message !== 'API Key Missing') {
+                     if(state.cloud.backup) { 
+                         ui.toast("Primary failed/timed out, using Backup...", "warning"); 
+                         return await tryCall(state.cloud.backup, true); 
+                     }
+                 }
+                 throw e; 
+             }
         }
 
         function handleUnresponsive(e) {
@@ -754,7 +838,14 @@
             updateHeader();
         }
 
-        function detectProvider(key) { if(!state.cloud.autoDetect) return 'openrouter'; if(key.startsWith('AIza')) return 'google'; if(key.startsWith('sk-or-')) return 'openrouter'; if(key.startsWith('sk-')) return 'deepseek'; return 'openrouter'; }
+        function detectProvider(key) { 
+            if(!state.cloud.autoDetect) return 'openrouter'; 
+            if(key.startsWith('AIza')) return 'google'; 
+            if(key.startsWith('sk-or-')) return 'openrouter'; 
+            if(key.startsWith('sk-proj-') || (key.startsWith('sk-') && key.length > 40)) return 'openai';
+            if(key.startsWith('sk-')) return 'deepseek'; 
+            return 'openrouter'; 
+        }
 
         // --- SESSIONS ---
         function renderSessions() {
@@ -779,7 +870,7 @@
                             if(confirm('Delete chat permanently?')) { delete state.sessions[s.id]; if(s.id===state.currentSessionId) createSession(); else { saveState(); renderSessions(); } } 
                         }
                         else if(btn.classList.contains('copy-btn')) {
-                            // Lite: Deep Clone logic for branching narratives
+                            // Lite Port: Duplication
                             const newId = Date.now().toString(); 
                             const copy = JSON.parse(JSON.stringify(s));
                             copy.id = newId;
@@ -894,20 +985,11 @@
         function createSession() { 
             const id = Date.now().toString(); 
             state.sessions[id] = { 
-                id, 
-                name: "New Chat", 
-                history: [], 
-                created: Date.now(), 
-                system: "", 
-                recap: "", // Lite integration
-                lore: [],
+                id, name: "New Chat", history: [], created: Date.now(), system: "", recap: "", lore: [],
                 settings: { ...state.settings } 
             }; 
             state.currentSessionId = id; 
-            saveState(); 
-            renderSessions(); 
-            renderChat(); 
-            renderLore(); 
+            saveState(); renderSessions(); renderChat(); renderLore(); 
             if($('story-recap-input')) $('story-recap-input').value = "";
         }
         async function saveState() { await set(DB_KEY, state); }
@@ -918,9 +1000,7 @@
                 if(!state.sessions[state.currentSessionId].settings) state.sessions[state.currentSessionId].settings = {};
                 state.sessions[state.currentSessionId].settings.activeModelId = id;
             }
-            await saveState(); 
-            renderModels(); 
-            updateHeader(); 
+            await saveState(); renderModels(); updateHeader(); 
             if(id!=='cloud') await initEngine(id); else ui.toast("Cloud Active"); 
         };
         window.deleteLocal = async (id) => { if(confirm("Delete cache?")) { state.downloadedModels = state.downloadedModels.filter(x=>x!==id); if(state.settings.activeModelId===id) state.settings.activeModelId=null; await saveState(); renderModels(); updateHeader(); }};
@@ -946,16 +1026,13 @@
         };
 
         $('header-menu-btn').onclick = () => { renderModels(); renderSessions(); togglePanel(true); };
-        
         $('header-focus-btn').onclick = () => ui.toggleFocus(true);
         $('focus-exit-btn').onclick = () => ui.toggleFocus(false);
-        
         document.querySelectorAll('.tab-btn').forEach(btn => btn.onclick = () => switchTab(btn.dataset.tab));
 
         $('ctx-slider').oninput = (e) => updateContextUI(e.target.value);
         $('temp-slider').oninput = (e) => { 
-            $('temp-val').textContent = e.target.value; 
-            state.settings.temperature = e.target.value; 
+            $('temp-val').textContent = e.target.value; state.settings.temperature = e.target.value; 
             if(state.currentSessionId) state.sessions[state.currentSessionId].settings.temperature = e.target.value;
             saveState();
         };
@@ -967,6 +1044,14 @@
             state.cloud.endpoint=$('cloud-endpoint').value.trim(); 
             state.cloud.autoDetect=$('auto-detect-toggle').checked; 
             window.setActive('cloud'); 
+        };
+
+        // Lite Port: System Reset Hook
+        $('wipe-data-btn').onclick = async () => {
+            if(confirm("Factory Reset? This will permanently wipe all local models, sessions, and configurations.")) {
+                await del(DB_KEY);
+                location.reload();
+            }
         };
 
         $('float-toggle-btn').onclick = () => { const i=$('floating-items'), b=$('float-toggle-btn').querySelector('i'); if(i.classList.contains('pointer-events-none')){ i.classList.remove('opacity-0','translate-y-4','pointer-events-none','scale-95'); b.classList.add('rotate-45'); } else { i.classList.add('opacity-0','translate-y-4','pointer-events-none','scale-95'); b.classList.remove('rotate-45'); }};
