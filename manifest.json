@@ -1,12 +1,12 @@
 {
-  "name": "CWAI 1.4",
-  "short_name": "CWAI 1.4",
-  "start_url": "./",
-  "id": "./index.html",
+  "name": "CWAI 1.5 | Hybrid Neural Interface",
+  "short_name": "CWAI 1.5",
+  "start_url": "./index.html",
+  "id": "cwai-1-5",
   "display": "standalone",
   "background_color": "#050505",
   "theme_color": "#2563eb",
-  "description": "Offline Local AI Chat Interface",
+  "description": "Hybrid Local/Cloud AI with Smart Lore and Auto-Discovery",
   "orientation": "portrait-primary",
   "categories": [
     "entertainment",
@@ -15,25 +15,25 @@
   ],
   "icons": [
     {
-      "src": "https://dummyimage.com/192x192/2563eb/ffffff.png&text=CWAI",
+      "src": "https://dummyimage.com/192x192/2563eb/ffffff.png&text=CW1.5",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://dummyimage.com/192x192/2563eb/ffffff.png&text=CWAI",
+      "src": "https://dummyimage.com/192x192/2563eb/ffffff.png&text=CW1.5",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "https://dummyimage.com/512x512/2563eb/ffffff.png&text=CWAI",
+      "src": "https://dummyimage.com/512x512/2563eb/ffffff.png&text=CW1.5",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://dummyimage.com/512x512/2563eb/ffffff.png&text=CWAI",
+      "src": "https://dummyimage.com/512x512/2563eb/ffffff.png&text=CW1.5",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -41,23 +41,23 @@
   ],
   "screenshots": [
     {
-      "src": "https://dummyimage.com/1080x1920/2563eb/ffffff.png&text=Chat+Interface",
+      "src": "https://dummyimage.com/1080x1920/2563eb/ffffff.png&text=Neural+Interface",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Chat Interface"
+      "label": "Neural Interface"
     },
     {
-      "src": "https://dummyimage.com/1920x1080/2563eb/ffffff.png&text=Desktop+Mode",
+      "src": "https://dummyimage.com/1920x1080/2563eb/ffffff.png&text=Story+Recap+View",
       "sizes": "1920x1080",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Desktop Mode"
+      "label": "Story Recap View"
     }
   ],
   "shortcuts": [
     {
-      "name": "New Chat",
+      "name": "New Story Branch",
       "short_name": "New",
       "url": "./index.html?action=new",
       "icons": [
