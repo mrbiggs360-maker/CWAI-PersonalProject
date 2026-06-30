@@ -1,10 +1,11 @@
-// sw.js - CWAI 1.6
-const CACHE_NAME = 'cwai-v1.6';
+// sw.js - CWAI 1.6.1
+const CACHE_NAME = 'cwai-v1.6.1';
 
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './1000017450.png',
   // UI Assets
   'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css',
@@ -24,7 +25,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate: Clean up old versions so the 1.6 logic takes over
+// Activate: Clean up old versions so the 1.6.1 logic takes over
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => Promise.all(
