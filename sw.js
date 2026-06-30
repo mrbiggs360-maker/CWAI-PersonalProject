@@ -1,5 +1,5 @@
-// sw.js - CWAI 1.5
-const CACHE_NAME = 'cwai-v1.5';
+// sw.js - CWAI 1.6
+const CACHE_NAME = 'cwai-v1.6';
 
 const ASSETS = [
   './',
@@ -24,7 +24,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate: Clean up old 1.4 versions so the 1.5 logic takes over
+// Activate: Clean up old versions so the 1.6 logic takes over
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => Promise.all(
@@ -55,6 +55,7 @@ self.addEventListener('fetch', (event) => {
         return networkResponse;
       })
       .catch(() => {
+        // Fallback for full offline integration
         return caches.match(event.request);
       })
   );
