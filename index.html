@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CWAI 1.6.1 | Neural Interface</title>
+    <title>CWAI 1.6 | Neural Interface</title>
     
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#050505">
-    <link rel="apple-touch-icon" href="./1000017450.png">
+    <link rel="apple-touch-icon" href="https://dummyimage.com/192x192/2563eb/ffffff.png&text=CWAI+1.6">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -78,9 +78,16 @@
 
     <div id="main-header" class="fixed top-0 left-0 right-0 h-14 glass z-20 flex items-center justify-between px-4 border-b border-gray-800 transition-transform duration-300">
         <div class="flex items-center gap-3">
-            <img src="./1000017450.png" alt="CWAI Logo" class="w-9 h-9 rounded-2xl shadow-lg shadow-blue-900/40 cursor-pointer hover:scale-105 transition-transform duration-300 object-cover" onclick="togglePanel(true)">
+            <div class="w-9 h-9 rounded-2xl bg-gradient-to-b from-blue-600 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-900/40 cursor-pointer hover:scale-105 transition-transform duration-300" onclick="togglePanel(true)">
+                 <svg viewBox="0 0 100 100" class="w-6 h-6 text-white drop-shadow-md" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M50 85 C40 85 25 75 25 55 C25 35 35 25 45 25 C35 25 30 35 30 45" />
+                    <path d="M50 85 C60 85 75 75 75 55 C75 35 65 25 55 25 C65 25 70 35 70 45" />
+                    <path d="M45 25 C50 25 50 45 35 55" />
+                    <path d="M55 25 C50 25 50 45 65 55" />
+                </svg>
+            </div>
             <div>
-                <h1 class="text-sm font-bold text-gray-100 tracking-tight leading-none">CWAI 1.6.1</h1>
+                <h1 class="text-sm font-bold text-gray-100 tracking-tight leading-none">CWAI 1.6</h1>
                 <div id="header-model-status" class="text-[10px] text-gray-400 flex items-center gap-1 cursor-pointer hover:text-blue-400 transition mt-0.5">
                     <span class="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]" id="status-dot"></span>
                     <span id="current-model-name">No Model Loaded</span>
@@ -379,26 +386,8 @@
             else { b.classList.add('opacity-0'); p.classList.remove('open'); p.classList.add('closed'); setTimeout(()=>b.classList.add('hidden'), 300); }
         };
 
-        async function checkStorageQuota() {
-            if (navigator.storage && navigator.storage.estimate) {
-                try {
-                    const estimate = await navigator.storage.estimate();
-                    const freeSpaceGB = (estimate.quota - estimate.usage) / (1024 * 1024 * 1024);
-                    const percentUsed = (estimate.usage / estimate.quota) * 100;
-                    
-                    if (percentUsed > 85 || freeSpaceGB < 2) {
-                        ui.toast(`Storage Warning: Device space low. Browser may auto-clear local AI models.`, 'warning');
-                    }
-                } catch(e) {
-                    console.error("Storage estimate failed", e);
-                }
-            }
-        }
-
         async function loadState() {
             try {
-                await checkStorageQuota();
-                
                 $('ram-badge').textContent = `RAM: ~${deviceRam}GB`;
                 $('user-input').value = localStorage.getItem('cwai_draft') || '';
 
@@ -687,7 +676,6 @@
 
         async function downloadModel(id) {
             if(isDownloading) return; isDownloading = true;
-            await checkStorageQuota();
             ui.showLoader(true, "Downloading Model", "Connecting...");
             try {
                 if (!engine) engine = new webllm.MLCEngine();
@@ -829,7 +817,7 @@
                  } else {
                      url = baseEndpoint; 
                      headers = { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' };
-                     if(prov === 'openrouter') { headers['HTTP-Referer'] = window.location.href; headers['X-Title'] = 'CWAI 1.6.1'; }
+                     if(prov === 'openrouter') { headers['HTTP-Referer'] = window.location.href; headers['X-Title'] = 'CWAI 1.6'; }
                      const cleanMessages = messages.map(m => ({ role: m.role==='model'?'assistant':m.role, content: m.content }));
                      body = JSON.stringify({ model: state.cloud.targetModel || 'gpt-3.5-turbo', messages: cleanMessages, temperature: parseFloat(state.settings.temperature) });
                  }
@@ -951,7 +939,7 @@
                  c.innerHTML = `
                     <div id="welcome-message" class="flex flex-col items-center justify-center h-[60vh] text-gray-600 fade-in">
                         <div class="w-20 h-20 rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center mb-6 shadow-2xl rotate-3 hover:rotate-0 transition duration-500 group">
-                             <img src="./1000017450.png" alt="CWAI Logo" class="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300">
+                             <i class="ri-cpu-line text-5xl text-gray-700 group-hover:text-blue-500 transition-colors"></i>
                         </div>
                         <h2 class="text-xl font-bold text-gray-300 mb-2">Neural Interface Ready</h2>
                         <p class="text-sm font-mono text-gray-500 text-center max-w-xs" id="ram-welcome-msg">Detecting Hardware...</p>
