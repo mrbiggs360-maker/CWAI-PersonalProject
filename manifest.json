@@ -1,8 +1,8 @@
 {
-  "name": "CWAI 1.6.1 | Hybrid Neural Interface",
-  "short_name": "CWAI 1.6.1",
+  "name": "CWAI 1.6 | Hybrid Neural Interface",
+  "short_name": "CWAI 1.6",
   "start_url": "./index.html",
-  "id": "cwai-1-6-1",
+  "id": "cwai-1-6",
   "display": "standalone",
   "background_color": "#050505",
   "theme_color": "#2563eb",
@@ -15,25 +15,25 @@
   ],
   "icons": [
     {
-      "src": "./1000017450.png",
+      "src": "https://dummyimage.com/192x192/2563eb/ffffff.png&text=CW1.6",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./1000017450.png",
+      "src": "https://dummyimage.com/192x192/2563eb/ffffff.png&text=CW1.6",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "./1000017450.png",
+      "src": "https://dummyimage.com/512x512/2563eb/ffffff.png&text=CW1.6",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./1000017450.png",
+      "src": "https://dummyimage.com/512x512/2563eb/ffffff.png&text=CW1.6",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -62,7 +62,7 @@
       "url": "./index.html?action=new",
       "icons": [
         {
-          "src": "./1000017450.png",
+          "src": "https://dummyimage.com/192x192/2563eb/ffffff.png&text=+",
           "sizes": "192x192",
           "type": "image/png"
         }
