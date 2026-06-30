@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CWAI 1.5 | Neural Interface</title>
+    <title>CWAI 1.6 | Neural Interface</title>
     
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#050505">
-    <link rel="apple-touch-icon" href="https://dummyimage.com/192x192/2563eb/ffffff.png&text=CWAI+1.5">
+    <link rel="apple-touch-icon" href="https://dummyimage.com/192x192/2563eb/ffffff.png&text=CWAI+1.6">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -87,7 +87,7 @@
                 </svg>
             </div>
             <div>
-                <h1 class="text-sm font-bold text-gray-100 tracking-tight leading-none">CWAI 1.5</h1>
+                <h1 class="text-sm font-bold text-gray-100 tracking-tight leading-none">CWAI 1.6</h1>
                 <div id="header-model-status" class="text-[10px] text-gray-400 flex items-center gap-1 cursor-pointer hover:text-blue-400 transition mt-0.5">
                     <span class="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]" id="status-dot"></span>
                     <span id="current-model-name">No Model Loaded</span>
@@ -278,15 +278,6 @@
 
     <div id="toast-container" class="fixed top-20 right-4 z-[110] flex flex-col gap-2 pointer-events-none"></div>
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker registered successfully'))
-                .catch(err => console.error('Service Worker registration failed:', err));
-            });
-        }
-    </script>
     <script type="module">
         import * as webllm from "https://esm.run/@mlc-ai/web-llm";
         import { get, set, del } from 'https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm';
@@ -358,6 +349,36 @@
                 else { $('focus-exit-btn').classList.add('hidden'); }
             }
         };
+
+        // --- OFFLINE & UPDATE LOGIC ---
+        window.addEventListener('offline', () => ui.toast("You are offline. Local models active.", "warning"));
+        window.addEventListener('online', () => ui.toast("Connection restored!", "success"));
+
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (refreshing) return;
+            refreshing = true;
+            ui.toast("Update installed! Refreshing...", "success");
+            setTimeout(() => window.location.reload(), 1500);
+        });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .then(reg => {
+                    console.log('Service Worker registered');
+                    reg.addEventListener('updatefound', () => {
+                        const newWorker = reg.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                newWorker.postMessage('SKIP_WAITING');
+                            }
+                        });
+                    });
+                })
+                .catch(err => console.error('Service Worker registration failed:', err));
+            });
+        }
 
         window.togglePanel = (show) => {
             const p = $('control-panel'), b = $('panel-backdrop');
@@ -796,7 +817,7 @@
                  } else {
                      url = baseEndpoint; 
                      headers = { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' };
-                     if(prov === 'openrouter') { headers['HTTP-Referer'] = window.location.href; headers['X-Title'] = 'CWAI 1.5'; }
+                     if(prov === 'openrouter') { headers['HTTP-Referer'] = window.location.href; headers['X-Title'] = 'CWAI 1.6'; }
                      const cleanMessages = messages.map(m => ({ role: m.role==='model'?'assistant':m.role, content: m.content }));
                      body = JSON.stringify({ model: state.cloud.targetModel || 'gpt-3.5-turbo', messages: cleanMessages, temperature: parseFloat(state.settings.temperature) });
                  }
